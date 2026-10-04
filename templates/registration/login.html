@@ -1,0 +1,68 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - Cobro</title>
+
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+
+<body>
+
+    <main class="contenedor-login">
+
+        <section class="tarjeta-login">
+
+            <div class="logo">
+                $
+            </div>
+
+            <h1>COBRO</h1>
+
+            <p class="subtitulo">
+                Administración de préstamos
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="campo">
+                    <label for="{{ form.username.id_for_label }}">
+                        Usuario
+                    </label>
+
+                    {{ form.username }}
+                </div>
+
+                <div class="campo">
+                    <label for="{{ form.password.id_for_label }}">
+                        Contraseña
+                    </label>
+
+                    {{ form.password }}
+                </div>
+
+                {% if form.errors %}
+                    <p class="error">
+                        Usuario o contraseña incorrectos.
+                    </p>
+                {% endif %}
+
+                <button type="submit" class="boton-entrar">
+                    Iniciar sesión
+                </button>
+            </form>
+
+        </section>
+
+        <p class="pie">
+            Sistema de gestión de préstamos
+        </p>
+
+    </main>
+
+</body>
+</html>

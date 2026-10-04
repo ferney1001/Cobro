@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Clientes - Cobro</title>
+
+    <link rel="stylesheet" href="{% static 'clientes/css/clientes.css' %}">
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <div class="encabezado">
+            <h1>Clientes</h1>
+
+            <a href="{% url 'crear_cliente' %}" class="boton-nuevo">
+                + Nuevo
+            </a>
+        </div>
+
+        {% for cliente in clientes %}
+
+            <div class="cliente">
+
+                <h2>
+                    {{ cliente.nombre }} {{ cliente.apellido }}
+                </h2>
+
+                <p>
+                    📱 {{ cliente.telefono }}
+                </p>
+                <a href="{% url 'editar_cliente' cliente.id %}" class="boton-editar">
+                    Editar
+                </a>
+
+            </div>
+
+        {% empty %}
+
+            <div class="sin-clientes">
+                <p>No hay clientes registrados.</p>
+
+                <a href="{% url 'crear_cliente' %}">
+                    Crear el primer cliente
+                </a>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</body>
+</html>

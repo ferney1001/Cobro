@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.contenedor {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+}
+
+.boton-nuevo {
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.cliente {
+    background-color: white;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.cliente h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+}
+
+.cliente p {
+    margin: 4px 0;
+    color: #555;
+}
+
+.sin-clientes {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+.boton-editar {
+    display: inline-block;
+    background-color: #f59e0b;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+.formulario {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.formulario p {
+    margin-bottom: 16px;
+}
+
+.formulario label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.formulario input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.boton-guardar {
+    width: 100%;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.boton-cancelar {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    color: #555;
+    text-decoration: none;
+    padding: 10px;
+}

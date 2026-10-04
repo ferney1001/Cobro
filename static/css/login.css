@@ -1,0 +1,133 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor-login {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+.tarjeta-login {
+    background-color: white;
+    padding: 35px 30px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.logo {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px auto;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 30px;
+    color: #1f2937;
+}
+
+.subtitulo {
+    margin: 8px 0 30px 0;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.campo {
+    margin-bottom: 20px;
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 7px;
+    color: #374151;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.campo input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.boton-entrar {
+    width: 100%;
+    padding: 13px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 9px;
+    background-color: #2563eb;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.boton-entrar:hover {
+    background-color: #1d4ed8;
+}
+
+.error {
+    margin: 0 0 15px 0;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    font-size: 14px;
+    text-align: center;
+}
+
+.pie {
+    margin: 18px 0 0 0;
+    text-align: center;
+    color: white;
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+
+    body {
+        align-items: flex-start;
+    }
+
+    .contenedor-login {
+        padding: 20px 15px;
+        margin-top: 50px;
+    }
+
+    .tarjeta-login {
+        padding: 30px 22px;
+    }
+}
