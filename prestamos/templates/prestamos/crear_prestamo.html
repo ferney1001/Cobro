@@ -1,0 +1,161 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Nuevo préstamo</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/crear_prestamo.css' %}"
+    >
+
+</head>
+
+<body>
+
+    <header class="encabezado">
+
+        <h1>Nuevo préstamo</h1>
+
+    </header>
+
+
+    <main class="contenedor">
+
+        <form method="post" class="formulario">
+
+            {% csrf_token %}
+
+
+            <div class="campo">
+
+                <label for="buscar-cliente">
+                    Cliente
+                </label>
+
+                <input
+                    type="text"
+                    id="buscar-cliente"
+                    placeholder="Buscar por nombre o apellido"
+                    autocomplete="off"
+                >
+
+                {{ formulario.cliente }}
+
+                <div
+                    id="resultados-clientes"
+                    class="resultados-clientes"
+                ></div>
+
+                {{ formulario.cliente.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                {{ formulario.monto.label_tag }}
+
+                {{ formulario.monto }}
+
+                {{ formulario.monto.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                {{ formulario.porcentaje_interes.label_tag }}
+
+                {{ formulario.porcentaje_interes }}
+
+                {{ formulario.porcentaje_interes.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                {{ formulario.frecuencia.label_tag }}
+
+                {{ formulario.frecuencia }}
+
+                {{ formulario.frecuencia.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                {{ formulario.numero_cuotas.label_tag }}
+
+                {{ formulario.numero_cuotas }}
+
+                {{ formulario.numero_cuotas.errors }}
+
+            </div>
+
+            <div id="resumen-prestamo" class="resumen-prestamo">
+
+                <h2>Resumen del préstamo</h2>
+
+                <p>
+                    Interés:
+                    <strong id="resumen-interes">$0,00</strong>
+                </p>
+
+                <p>
+                    Total a pagar:
+                    <strong id="resumen-total">$0,00</strong>
+                </p>
+
+                <p>
+                    Valor por cuota:
+                    <strong id="resumen-cuota">$0,00</strong>
+                </p>
+
+            </div>
+
+            <div class="campo">
+
+                {{ formulario.fecha_prestamo.label_tag }}
+
+                {{ formulario.fecha_prestamo }}
+
+                {{ formulario.fecha_prestamo.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                {{ formulario.fecha_primer_cobro.label_tag }}
+
+                {{ formulario.fecha_primer_cobro }}
+
+                {{ formulario.fecha_primer_cobro.errors }}
+
+            </div>
+
+
+            <button type="submit" class="boton">
+
+                Crear préstamo
+
+            </button>
+
+        </form>
+
+    </main>
+<script src="{% static 'prestamos/js/prestamos.js' %}"></script>
+</body>
+
+</html>

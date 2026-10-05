@@ -1,4 +1,5 @@
 {% load static %}
+{% load formato_dinero %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -24,6 +25,7 @@
 
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
+
                 <button type="submit" class="boton-salir">
                     Salir
                 </button>
@@ -58,13 +60,15 @@
         <section class="seccion">
 
             <div class="titulo-seccion">
+
                 <h1>
                     Cobros de hoy
                 </h1>
 
                 <span class="contador">
-                    2
+                    {{ cobros_hoy|length }}
                 </span>
+
             </div>
 
 
@@ -101,58 +105,59 @@
 
             <div class="lista-cobros">
 
+                {% for item in cobros_hoy %}
 
-                <article class="tarjeta-cobro pendiente">
+                    <article class="tarjeta-cobro pendiente">
 
-                    <div class="informacion">
+                        <div class="informacion">
 
-                        <div class="nombre-cliente">
-                            <span class="estado rojo"></span>
-                            Pablo Gómez
+                            <div class="nombre-cliente">
+
+                                <span class="estado rojo"></span>
+
+                                {{ item.cuota.prestamo.cliente.nombre }}
+                                {{ item.cuota.prestamo.cliente.apellido }}
+
+                            </div>
+
+                            <p>
+                                Préstamo #{{ item.cuota.prestamo.numero_prestamo }}
+                                · Cuota {{ item.cuota.numero }}
+                                de {{ item.cuota.prestamo.numero_cuotas }}
+                            </p>
+
+                            <p>
+                                Cobro:
+                                {{ item.cuota.fecha_cobro|date:"d/m/Y" }}
+                            </p>
+
+                            <strong>
+                                Cuota: ${{ item.cuota.valor|dinero }}
+                            </strong>
+
+                            <p>
+                                Abonado: ${{ item.abonado|dinero }}
+                            </p>
+
+                            <p>
+                                Pendiente: ${{ item.pendiente|dinero }}
+                            </p>
+
                         </div>
 
-                        <p>
-                            Cuota #3 · Hoy
-                        </p>
+                        <button class="boton-pago">
+                            Registrar pago
+                        </button>
 
-                        <strong>
-                            $25.000
-                        </strong>
+                    </article>
 
-                    </div>
+                {% empty %}
 
-                    <button class="boton-pago">
-                        Registrar pago
-                    </button>
+                    <p>
+                        No hay cobros pendientes para hoy.
+                    </p>
 
-                </article>
-
-
-                <article class="tarjeta-cobro abono">
-
-                    <div class="informacion">
-
-                        <div class="nombre-cliente">
-                            <span class="estado amarillo"></span>
-                            María Pérez
-                        </div>
-
-                        <p>
-                            Cuota #2 · Hoy
-                        </p>
-
-                        <strong>
-                            Pendiente: $15.000
-                        </strong>
-
-                    </div>
-
-                    <button class="boton-pago">
-                        Registrar pago
-                    </button>
-
-                </article>
-
+                {% endfor %}
 
             </div>
 
@@ -170,7 +175,7 @@
                 </h1>
 
                 <span class="contador">
-                    1
+                    {{ atrasados|length }}
                 </span>
 
             </div>
@@ -205,35 +210,59 @@
 
             <div class="lista-cobros">
 
+                {% for item in atrasados %}
 
-                <article class="tarjeta-cobro pendiente">
+                    <article class="tarjeta-cobro pendiente">
 
-                    <div class="informacion">
+                        <div class="informacion">
 
-                        <div class="nombre-cliente">
+                            <div class="nombre-cliente">
 
-                            <span class="estado rojo"></span>
+                                <span class="estado rojo"></span>
 
-                            Carlos Rodríguez
+                                {{ item.cuota.prestamo.cliente.nombre }}
+                                {{ item.cuota.prestamo.cliente.apellido }}
+
+                            </div>
+
+                            <p>
+                                Préstamo #{{ item.cuota.prestamo.numero_prestamo }}
+                                · Cuota {{ item.cuota.numero }}
+                                de {{ item.cuota.prestamo.numero_cuotas }}
+                            </p>
+
+                            <p>
+                                Vencida:
+                                {{ item.cuota.fecha_cobro|date:"d/m/Y" }}
+                            </p>
+
+                            <strong>
+                                Cuota: ${{ item.cuota.valor|dinero }}
+                            </strong>
+
+                            <p>
+                                Abonado: ${{ item.abonado|dinero }}
+                            </p>
+
+                            <p>
+                                Pendiente: ${{ item.pendiente|dinero }}
+                            </p>
 
                         </div>
 
-                        <p>
-                            Cuota #1 · Vencida
-                        </p>
+                        <button class="boton-pago">
+                            Registrar pago
+                        </button>
 
-                        <strong>
-                            Pendiente: $30.000
-                        </strong>
+                    </article>
 
-                    </div>
+                {% empty %}
 
-                    <button class="boton-pago">
-                        Registrar pago
-                    </button>
+                    <p>
+                        No hay cuotas atrasadas.
+                    </p>
 
-                </article>
-
+                {% endfor %}
 
             </div>
 

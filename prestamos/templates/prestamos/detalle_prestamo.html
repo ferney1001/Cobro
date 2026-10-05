@@ -1,0 +1,230 @@
+{% load static %}
+{% load formato_dinero %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Detalle del préstamo</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/detalle_prestamo.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <h1>Detalle del préstamo</h1>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <a
+            href="{% url 'lista_prestamos' %}"
+            class="boton-volver"
+        >
+            ← Volver a préstamos
+        </a>
+
+
+        <!-- Información del préstamo -->
+
+        <section class="tarjeta-resumen">
+
+
+            <h2>
+                {{ prestamo.cliente }}
+            </h2>
+
+
+            <p class="subtitulo">
+                Préstamo #{{ prestamo.numero_prestamo }}
+            </p>
+
+
+            <div class="datos-prestamo">
+
+
+                <div class="dato destacado">
+
+                    <strong>Monto prestado</strong>
+
+                    <span>
+                        ${{ prestamo.monto|dinero }}
+                    </span>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <strong>Interés</strong>
+
+                    <span>
+                        {{ prestamo.porcentaje_interes }}%
+                    </span>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <strong>Frecuencia</strong>
+
+                    <span>
+                        {{ prestamo.get_frecuencia_display }}
+                    </span>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <strong>Número de cuotas</strong>
+
+                    <span>
+                        {{ prestamo.numero_cuotas }}
+                    </span>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <strong>Fecha del préstamo</strong>
+
+                    <span>
+                        {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
+                    </span>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <strong>Primer cobro</strong>
+
+                    <span>
+                        {{ prestamo.fecha_primer_cobro|date:"d/m/Y" }}
+                    </span>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <strong>Interés generado</strong>
+
+                    <span>
+                        ${{ interes|dinero }}
+                    </span>
+
+                </div>
+
+
+                <div class="dato destacado">
+
+                    <strong>Total a pagar</strong>
+
+                    <span>
+                        ${{ total|dinero }}
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- Cuotas -->
+
+        <section class="seccion-cuotas">
+
+
+            <h2>
+                Cuotas
+            </h2>
+
+
+            {% for cuota in cuotas %}
+
+
+                <article class="cuota">
+
+
+                    <div class="cabecera-cuota">
+
+
+                        <h3>
+                            Cuota {{ cuota.numero }} de {{ prestamo.numero_cuotas }}
+                        </h3>
+
+
+                        <span class="estado">
+                            {{ cuota.get_estado_display }}
+                        </span>
+
+
+                    </div>
+
+
+                    <div class="info-cuota">
+
+
+                        <span>
+                            Fecha de cobro:
+                            {{ cuota.fecha_cobro|date:"d/m/Y" }}
+                        </span>
+
+
+                        <span class="valor-cuota">
+                            ${{ cuota.valor|dinero }}
+                        </span>
+
+
+                    </div>
+
+
+                </article>
+
+
+            {% empty %}
+
+
+                <p>
+                    Este préstamo todavía no tiene cuotas.
+                </p>
+
+
+            {% endfor %}
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

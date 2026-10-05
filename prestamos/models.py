@@ -3,7 +3,9 @@ from decimal import Decimal, ROUND_HALF_UP
 import calendar
 
 from django.db import models
+from django.db.models import Max
 from django.core.exceptions import ValidationError
+
 from clientes.models import Cliente
 
 
@@ -19,6 +21,11 @@ class Prestamo(models.Model):
         Cliente,
         on_delete=models.CASCADE,
         related_name='prestamos'
+    )
+
+    numero_prestamo = models.PositiveIntegerField(
+        null=True,
+        blank=True
     )
 
     monto = models.DecimalField(
@@ -50,6 +57,7 @@ class Prestamo(models.Model):
         return f"Préstamo de {self.cliente} - ${self.monto}"
 
     def clean(self):
+
         if self.fecha_primer_cobro < self.fecha_prestamo:
             raise ValidationError(
                 'La fecha del primer cobro no puede ser anterior a la fecha del préstamo.'
@@ -59,18 +67,33 @@ class Prestamo(models.Model):
             raise ValidationError(
                 'El monto del préstamo debe ser mayor que cero.'
             )
+
         if self.numero_cuotas <= 0:
             raise ValidationError(
                 'El número de cuotas debe ser mayor que cero.'
             )
+
         if self.porcentaje_interes < 0:
             raise ValidationError(
                 'El porcentaje de interés no puede ser negativo.'
             )
-    
+
     def save(self, *args, **kwargs):
+
         self.full_clean()
+
         es_nuevo = self.pk is None
+
+        if es_nuevo and self.numero_prestamo is None:
+
+            ultimo_numero = self.cliente.prestamos.aggregate(
+                max_numero=Max('numero_prestamo')
+            )['max_numero']
+
+            if ultimo_numero is None:
+                self.numero_prestamo = 1
+            else:
+                self.numero_prestamo = ultimo_numero + 1
 
         super().save(*args, **kwargs)
 
@@ -186,6 +209,8 @@ class Cuota(models.Model):
 
     def __str__(self):
         return f"Cuota {self.numero} - {self.prestamo.cliente}"
+
+
 class Pago(models.Model):
 
     cuota = models.ForeignKey(

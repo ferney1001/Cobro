@@ -1,0 +1,193 @@
+{% load static %}
+{% load formato_dinero %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Registrar pago - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/registrar_pago.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <h1>
+            Registrar pago
+        </h1>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <a
+            href="{% url 'inicio' %}"
+            class="boton-volver"
+        >
+            ← Volver al dashboard
+        </a>
+
+
+        <section class="tarjeta">
+
+
+            <div class="cliente">
+
+                <h2>
+                    {{ cuota.prestamo.cliente.nombre }}
+                    {{ cuota.prestamo.cliente.apellido }}
+                </h2>
+
+                <p>
+                    Préstamo #{{ cuota.prestamo.numero_prestamo }}
+                    · Cuota {{ cuota.numero }}
+                    de {{ cuota.prestamo.numero_cuotas }}
+                </p>
+
+            </div>
+
+
+            <div class="resumen">
+
+
+                <div class="dato">
+
+                    <span>
+                        Valor de la cuota
+                    </span>
+
+                    <strong>
+                        ${{ cuota.valor|dinero }}
+                    </strong>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <span>
+                        Abonado
+                    </span>
+
+                    <strong>
+                        ${{ abonado|dinero }}
+                    </strong>
+
+                </div>
+
+
+                <div class="dato pendiente">
+
+                    <span>
+                        Pendiente
+                    </span>
+
+                    <strong>
+                        ${{ pendiente|dinero }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <form
+                method="post"
+                class="formulario"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="campo">
+
+                    <label for="{{ formulario.monto.id_for_label }}">
+                        ¿Cuánto va a pagar?
+                    </label>
+
+                    {{ formulario.monto }}
+
+                    {% if formulario.monto.errors %}
+
+                        <div class="error">
+
+                            {{ formulario.monto.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="{{ formulario.fecha_hora.id_for_label }}">
+                        Fecha y hora del pago
+                    </label>
+
+                    {{ formulario.fecha_hora }}
+
+                    {% if formulario.fecha_hora.errors %}
+
+                        <div class="error">
+
+                            {{ formulario.fecha_hora.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if formulario.non_field_errors %}
+
+                    <div class="error">
+
+                        {{ formulario.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <button
+                    type="submit"
+                    class="boton-confirmar"
+                >
+                    Confirmar pago
+                </button>
+
+
+            </form>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

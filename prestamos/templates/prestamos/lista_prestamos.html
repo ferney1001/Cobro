@@ -1,0 +1,164 @@
+{% load static %}
+{% load formato_dinero %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Préstamos - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/lista_prestamos.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <h1>
+            Préstamos
+        </h1>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <div class="barra-superior">
+
+            <h2>
+                Préstamos registrados
+            </h2>
+
+            <a
+                href="{% url 'crear_prestamo' %}"
+                class="boton-nuevo"
+            >
+                + Nuevo préstamo
+            </a>
+
+        </div>
+
+
+        <form
+            method="get"
+            class="busqueda"
+        >
+
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="🔎 Buscar cliente..."
+            >
+
+            <button type="submit">
+                Buscar
+            </button>
+
+        </form>
+
+
+        <section class="lista-prestamos">
+
+
+            {% for prestamo in prestamos %}
+
+
+                <article class="tarjeta-prestamo">
+
+
+                    <div class="informacion">
+
+
+                        <h3>
+                            {{ prestamo.cliente.nombre }}
+                            {{ prestamo.cliente.apellido }}
+                        </h3>
+
+
+                        <p>
+                            Préstamo #{{ prestamo.numero_prestamo }}
+                        </p>
+
+
+                        <p>
+                            Monto:
+                            <strong>
+                                ${{ prestamo.monto|dinero }}
+                            </strong>
+                        </p>
+
+
+                        <p>
+                            Interés:
+                            {{ prestamo.porcentaje_interes }}%
+                        </p>
+
+
+                        <p>
+                            Frecuencia:
+                            {{ prestamo.get_frecuencia_display }}
+                        </p>
+
+
+                        <p>
+                            Cuotas:
+                            {{ prestamo.numero_cuotas }}
+                        </p>
+
+
+                        <p>
+                            Fecha:
+                            {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
+                        </p>
+
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'detalle_prestamo' prestamo.id %}"
+                        class="boton-detalle"
+                    >
+                        Ver préstamo
+                    </a>
+
+
+                </article>
+
+
+            {% empty %}
+
+
+                <p class="sin-prestamos">
+                    No hay préstamos registrados.
+                </p>
+
+
+            {% endfor %}
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>
