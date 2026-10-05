@@ -1,0 +1,246 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - Cobro</title>
+
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+</head>
+
+<body>
+
+    <header class="barra-superior">
+
+        <div class="logo">
+            COBRO
+        </div>
+
+        <div class="usuario">
+            <span>{{ request.user.username }}</span>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="boton-salir">
+                    Salir
+                </button>
+            </form>
+        </div>
+
+    </header>
+
+
+    <nav class="navegacion">
+
+        <a href="#" class="activo">
+            Clientes
+        </a>
+
+        <a href="#">
+            Préstamos
+        </a>
+
+        <a href="#">
+            Contabilidad
+        </a>
+
+    </nav>
+
+
+    <main class="contenido">
+
+
+        <!-- COBROS DE HOY -->
+
+        <section class="seccion">
+
+            <div class="titulo-seccion">
+                <h1>
+                    Cobros de hoy
+                </h1>
+
+                <span class="contador">
+                    2
+                </span>
+            </div>
+
+
+            <div class="busqueda">
+
+                <input
+                    type="text"
+                    placeholder="🔎 Buscar cliente..."
+                >
+
+            </div>
+
+
+            <div class="filtros">
+
+                <button class="filtro activo">
+                    Todos
+                </button>
+
+                <button class="filtro">
+                    Pendientes
+                </button>
+
+                <button class="filtro">
+                    Abonos
+                </button>
+
+                <button class="filtro">
+                    Pagados
+                </button>
+
+            </div>
+
+
+            <div class="lista-cobros">
+
+
+                <article class="tarjeta-cobro pendiente">
+
+                    <div class="informacion">
+
+                        <div class="nombre-cliente">
+                            <span class="estado rojo"></span>
+                            Pablo Gómez
+                        </div>
+
+                        <p>
+                            Cuota #3 · Hoy
+                        </p>
+
+                        <strong>
+                            $25.000
+                        </strong>
+
+                    </div>
+
+                    <button class="boton-pago">
+                        Registrar pago
+                    </button>
+
+                </article>
+
+
+                <article class="tarjeta-cobro abono">
+
+                    <div class="informacion">
+
+                        <div class="nombre-cliente">
+                            <span class="estado amarillo"></span>
+                            María Pérez
+                        </div>
+
+                        <p>
+                            Cuota #2 · Hoy
+                        </p>
+
+                        <strong>
+                            Pendiente: $15.000
+                        </strong>
+
+                    </div>
+
+                    <button class="boton-pago">
+                        Registrar pago
+                    </button>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ATRASADOS / ABONOS -->
+
+        <section class="seccion">
+
+            <div class="titulo-seccion">
+
+                <h1>
+                    Atrasados / Abonos
+                </h1>
+
+                <span class="contador">
+                    1
+                </span>
+
+            </div>
+
+
+            <div class="busqueda">
+
+                <input
+                    type="text"
+                    placeholder="🔎 Buscar cliente..."
+                >
+
+            </div>
+
+
+            <div class="filtros">
+
+                <button class="filtro activo">
+                    Todos
+                </button>
+
+                <button class="filtro">
+                    Pendientes
+                </button>
+
+                <button class="filtro">
+                    Abonos
+                </button>
+
+            </div>
+
+
+            <div class="lista-cobros">
+
+
+                <article class="tarjeta-cobro pendiente">
+
+                    <div class="informacion">
+
+                        <div class="nombre-cliente">
+
+                            <span class="estado rojo"></span>
+
+                            Carlos Rodríguez
+
+                        </div>
+
+                        <p>
+                            Cuota #1 · Vencida
+                        </p>
+
+                        <strong>
+                            Pendiente: $30.000
+                        </strong>
+
+                    </div>
+
+                    <button class="boton-pago">
+                        Registrar pago
+                    </button>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</body>
+</html>
