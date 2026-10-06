@@ -3,14 +3,15 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import render
+from django.utils import timezone
 
 from prestamos.models import Cuota
 
 
 @login_required
-def inicio(request):
+def dashboard(request):
 
-    hoy = __import__('django.utils.timezone').utils.timezone.localdate()
+    hoy = timezone.localdate()
 
     cuotas = Cuota.objects.select_related(
         'prestamo',
@@ -35,24 +36,38 @@ def inicio(request):
 
         pendiente = cuota.valor - abonado
 
+        # Determinar el estado de la cuota
         if pendiente <= Decimal('0.00'):
-            continue
+            estado = 'pagado'
+
+        elif abonado > Decimal('0.00'):
+            estado = 'abono'
+
+        else:
+            estado = 'pendiente'
 
         datos = {
             'cuota': cuota,
             'abonado': abonado,
-            'pendiente': pendiente,
+            'pendiente': max(pendiente, Decimal('0.00')),
+            'estado': estado,
         }
 
+        # COBROS DE HOY
         if cuota.fecha_cobro == hoy:
             cobros_hoy.append(datos)
 
+        # ATRASADOS
         elif cuota.fecha_cobro < hoy:
-            atrasados.append(datos)
+
+            # Solo mostramos cuotas que todavía tienen
+            # dinero pendiente.
+            if pendiente > Decimal('0.00'):
+                atrasados.append(datos)
 
     return render(
         request,
-        'dashboard/inicio.html',
+        'dashboard/dashboard.html',
         {
             'cobros_hoy': cobros_hoy,
             'atrasados': atrasados,

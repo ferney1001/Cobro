@@ -1,0 +1,83 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Desactivar cliente - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'clientes/css/clientes.css' %}"
+    >
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <a
+            href="{% url 'lista_clientes' %}"
+            class="boton-volver"
+        >
+            ← Volver a clientes
+        </a>
+
+        <div class="confirmacion">
+
+            <h1>
+                Desactivar cliente
+            </h1>
+
+            <p>
+                ¿Estás seguro de que deseas desactivar a:
+            </p>
+
+            <h2>
+                {{ cliente.nombre }}
+                {{ cliente.apellido }}
+            </h2>
+
+            <p>
+                📱 {{ cliente.telefono }}
+            </p>
+
+            <p class="advertencia">
+                El cliente dejará de aparecer en la lista principal,
+                pero su historial de préstamos y pagos se conservará.
+            </p>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="acciones">
+
+                    <a
+                        href="{% url 'lista_clientes' %}"
+                        class="boton-editar"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="boton-eliminar"
+                    >
+                        Desactivar cliente
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

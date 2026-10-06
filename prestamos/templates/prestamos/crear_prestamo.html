@@ -30,6 +30,15 @@
 
     <main class="contenedor">
 
+
+        <a
+            href="{% url 'lista_prestamos' %}"
+            class="boton-volver"
+        >
+            ← Volver a préstamos
+        </a>
+
+
         <form method="post" class="formulario">
 
             {% csrf_token %}
@@ -103,6 +112,7 @@
 
             </div>
 
+
             <div id="resumen-prestamo" class="resumen-prestamo">
 
                 <h2>Resumen del préstamo</h2>
@@ -123,6 +133,7 @@
                 </p>
 
             </div>
+
 
             <div class="campo">
 
@@ -155,7 +166,10 @@
         </form>
 
     </main>
-<script src="{% static 'prestamos/js/prestamos.js' %}"></script>
+
+
+    <script src="{% static 'prestamos/js/prestamos.js' %}"></script>
+
 </body>
 
 </html>

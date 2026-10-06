@@ -180,9 +180,25 @@
                         </h3>
 
 
-                        <span class="estado">
-                            {{ cuota.get_estado_display }}
-                        </span>
+                        {% if cuota.estado_calculado == 'pagada' %}
+
+                            <span class="estado estado-pagada">
+                                Pagado
+                            </span>
+
+                        {% elif cuota.estado_calculado == 'abono' %}
+
+                            <span class="estado estado-abono">
+                                Abono
+                            </span>
+
+                        {% else %}
+
+                            <span class="estado estado-pendiente">
+                                Pendiente
+                            </span>
+
+                        {% endif %}
 
 
                     </div>
@@ -203,6 +219,116 @@
 
 
                     </div>
+
+
+                    <div class="resumen-pago">
+
+
+                        <div>
+
+                            <strong>
+                                Abonado
+                            </strong>
+
+                            <span>
+                                ${{ cuota.abonado|dinero }}
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                Pendiente
+                            </strong>
+
+                            <span>
+                                ${{ cuota.pendiente|dinero }}
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    {% if cuota.pagos.all %}
+
+                        <div class="historial-pagos">
+
+                            <h4>
+                                Pagos realizados
+                            </h4>
+
+
+                            <div class="tabla-pagos">
+
+
+                                <!-- Encabezado -->
+
+                                <div class="fila-pago encabezado-pago">
+
+                                    <span>
+                                        Fecha
+                                    </span>
+
+                                    <span>
+                                        Hora
+                                    </span>
+
+                                    <span>
+                                        Abono
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Pagos -->
+
+                                {% for pago in cuota.pagos.all %}
+
+                                    <div class="fila-pago">
+
+                                        <span>
+                                            {{ pago.fecha_hora|date:"d/m/Y" }}
+                                        </span>
+
+                                        <span>
+                                            {{ pago.fecha_hora|date:"H:i" }}
+                                        </span>
+
+                                        <strong>
+                                            ${{ pago.monto|dinero }}
+                                        </strong>
+
+                                    </div>
+
+                                {% endfor %}
+
+
+                                <!-- Total -->
+
+                                <div class="fila-pago total-pago">
+
+                                    <strong>
+                                        Total abonado
+                                    </strong>
+
+                                    <span></span>
+
+                                    <strong>
+                                        ${{ cuota.abonado|dinero }}
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
 
 
                 </article>

@@ -2,42 +2,77 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Nuevo cliente - Cobro</title>
 
-    <link rel="stylesheet" href="{% static 'clientes/css/clientes.css' %}">
+    <link
+        rel="stylesheet"
+        href="{% static 'clientes/css/clientes.css' %}"
+    >
+
 </head>
+
 
 <body>
 
     <div class="contenedor">
 
-        <div class="encabezado">
-            <h1>Nuevo cliente</h1>
+        <div class="encabezado-formulario">
+
+            <a
+                href="{% url 'lista_clientes' %}"
+                class="boton-volver"
+            >
+                ← Volver a clientes
+            </a>
+
+            <h1>
+                Nuevo cliente
+            </h1>
+
         </div>
+
 
         <div class="formulario">
 
             <form method="post">
+
                 {% csrf_token %}
 
                 {{ formulario.as_p }}
 
-                <button type="submit" class="boton-guardar">
+
+                <button
+                    type="submit"
+                    class="boton-guardar"
+                >
                     Guardar cliente
                 </button>
+
             </form>
 
-            <a href="{% url 'lista_clientes' %}" class="boton-cancelar">
+
+            <a
+                href="{% url 'lista_clientes' %}"
+                class="boton-cancelar"
+            >
                 Cancelar
             </a>
 
         </div>
 
+
     </div>
 
 </body>
+
 </html>
