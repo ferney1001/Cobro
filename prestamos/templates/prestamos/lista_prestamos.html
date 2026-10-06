@@ -101,6 +101,14 @@
 
                         <p>
                             Préstamo #{{ prestamo.numero_prestamo }}
+
+                            ·
+
+                            {% if prestamo.tipo_prestamo == 'solo_intereses' %}
+                                Solo intereses
+                            {% else %}
+                                Capital + intereses
+                            {% endif %}
                         </p>
 
 

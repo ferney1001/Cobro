@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
+from django.db.models import Q
 from .models import Cliente
 from .forms import ClienteForm
 from django.contrib.auth.decorators import login_required
@@ -6,17 +7,43 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def lista_clientes(request):
+
+    texto = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
     clientes = Cliente.objects.filter(
         activo=True
     )
+
+    if texto:
+
+        palabras = texto.split()
+
+        consulta = Q()
+
+        for palabra in palabras:
+
+            consulta &= (
+                Q(nombre__icontains=palabra)
+                |
+                Q(apellido__icontains=palabra)
+            )
+
+        clientes = clientes.filter(
+            consulta
+        )
 
     return render(
         request,
         'clientes/lista_clientes.html',
         {
-            'clientes': clientes
+            'clientes': clientes,
+            'busqueda': texto
         }
     )
+
 
 @login_required
 def crear_cliente(request):
@@ -80,6 +107,7 @@ def editar_cliente(request, cliente_id):
         }
     )
 
+
 @login_required
 def desactivar_cliente(request, cliente_id):
 
@@ -103,20 +131,47 @@ def desactivar_cliente(request, cliente_id):
             'cliente': cliente
         }
     )
+
+
 @login_required
 def lista_clientes_inactivos(request):
+
+    texto = request.GET.get(
+        'q',
+        ''
+    ).strip()
 
     clientes = Cliente.objects.filter(
         activo=False
     )
 
+    if texto:
+
+        palabras = texto.split()
+
+        consulta = Q()
+
+        for palabra in palabras:
+
+            consulta &= (
+                Q(nombre__icontains=palabra)
+                |
+                Q(apellido__icontains=palabra)
+            )
+
+        clientes = clientes.filter(
+            consulta
+        )
+
     return render(
         request,
         'clientes/lista_clientes_inactivos.html',
         {
-            'clientes': clientes
+            'clientes': clientes,
+            'busqueda': texto
         }
     )
+
 
 @login_required
 def reactivar_cliente(request, cliente_id):
@@ -132,6 +187,10 @@ def reactivar_cliente(request, cliente_id):
         cliente.activo = True
         cliente.save()
 
-        return redirect('lista_clientes_inactivos')
+        return redirect(
+            'lista_clientes_inactivos'
+        )
 
-    return redirect('lista_clientes_inactivos')
+    return redirect(
+        'lista_clientes_inactivos'
+    )

@@ -5,7 +5,6 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -19,35 +18,39 @@
         rel="stylesheet"
         href="{% static 'prestamos/css/registrar_pago.css' %}"
     >
-
 </head>
-
 
 <body>
 
-
     <header class="encabezado">
 
-        <h1>
-            Registrar pago
-        </h1>
+        <div class="encabezado-contenido">
+
+            <h1>
+                Registrar pago
+            </h1>
+
+        </div>
 
     </header>
 
 
     <main class="contenedor">
 
-
         <a
             href="{% url 'dashboard' %}"
             class="boton-volver"
         >
-            ← Volver al dashboard
+            ← Volver al inicio
         </a>
 
 
         <section class="tarjeta">
 
+
+            <!-- =========================
+                 INFORMACIÓN DEL CLIENTE
+            ========================== -->
 
             <div class="cliente">
 
@@ -65,8 +68,11 @@
             </div>
 
 
-            <div class="resumen">
+            <!-- =========================
+                 RESUMEN
+            ========================== -->
 
+            <div class="resumen">
 
                 <div class="dato">
 
@@ -106,32 +112,85 @@
 
                 </div>
 
-
             </div>
 
+
+            <!-- =========================
+                 FORMULARIO
+            ========================== -->
 
             <form
                 method="post"
                 class="formulario"
+                id="formulario-pago"
+                data-tiene-errores="{% if formulario.errors %}true{% else %}false{% endif %}"
             >
 
                 {% csrf_token %}
 
 
+                <!-- =========================
+                     MONTO
+                ========================== -->
+
                 <div class="campo">
 
-                    <label for="{{ formulario.monto.id_for_label }}">
+                    <label>
                         ¿Cuánto va a pagar?
                     </label>
 
+
+                    <p class="texto-seleccion">
+                        Selecciona cómo registrar el pago
+                    </p>
+
+
+                    <!-- PAGO COMPLETO -->
+
+                    <button
+                        type="button"
+                        id="boton-pago-completo"
+                        class="boton-pago-completo"
+                        data-pendiente="{{ pendiente|floatformat:'0' }}"
+                    >
+
+                        <span class="pago-completo-texto">
+
+                            <span class="pago-completo-icono">
+                                ✓
+                            </span>
+
+                            <span>
+                                Pagar cuota completa
+                            </span>
+
+                        </span>
+
+
+                        <strong>
+                            ${{ pendiente|dinero }}
+                        </strong>
+
+                    </button>
+
+
+                    <!-- MONTO MANUAL -->
+
+                    <label
+                        for="{{ formulario.monto.id_for_label }}"
+                        class="label-monto-manual"
+                    >
+                        O ingresa otro valor
+                    </label>
+
+
                     {{ formulario.monto }}
+
 
                     {% if formulario.monto.errors %}
 
                         <div class="error">
-
                             {{ formulario.monto.errors }}
-
                         </div>
 
                     {% endif %}
@@ -139,20 +198,41 @@
                 </div>
 
 
+                <!-- =========================
+                     FECHA Y HORA
+                ========================== -->
+
                 <div class="campo">
 
-                    <label for="{{ formulario.fecha_hora.id_for_label }}">
+                    <label
+                        for="{{ formulario.fecha_hora.id_for_label }}"
+                    >
                         Fecha y hora del pago
                     </label>
 
+
+                    <button
+                        type="button"
+                        id="boton-hoy"
+                        class="boton-hoy"
+                    >
+                        Usar fecha y hora actual
+                    </button>
+
+
                     {{ formulario.fecha_hora }}
+
+
+                    <small class="ayuda">
+                        Puedes seleccionar una fecha anterior si el pago
+                        se realizó otro día.
+                    </small>
+
 
                     {% if formulario.fecha_hora.errors %}
 
                         <div class="error">
-
                             {{ formulario.fecha_hora.errors }}
-
                         </div>
 
                     {% endif %}
@@ -160,16 +240,22 @@
                 </div>
 
 
+                <!-- =========================
+                     ERRORES GENERALES
+                ========================== -->
+
                 {% if formulario.non_field_errors %}
 
                     <div class="error">
-
                         {{ formulario.non_field_errors }}
-
                     </div>
 
                 {% endif %}
 
+
+                <!-- =========================
+                     CONFIRMAR
+                ========================== -->
 
                 <button
                     type="submit"
@@ -178,15 +264,16 @@
                     Confirmar pago
                 </button>
 
-
             </form>
-
 
         </section>
 
-
     </main>
 
+
+    <script
+        src="{% static 'prestamos/js/registrar_pago.js' %}"
+    ></script>
 
 </body>
 

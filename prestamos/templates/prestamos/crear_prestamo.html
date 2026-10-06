@@ -44,6 +44,12 @@
             {% csrf_token %}
 
 
+            <!--
+                =========================================
+                CLIENTE
+                =========================================
+            -->
+
             <div class="campo">
 
                 <label for="buscar-cliente">
@@ -69,6 +75,29 @@
             </div>
 
 
+            <!--
+                =========================================
+                TIPO DE PRÉSTAMO
+                =========================================
+            -->
+
+            <div class="campo">
+
+                {{ formulario.tipo_prestamo.label_tag }}
+
+                {{ formulario.tipo_prestamo }}
+
+                {{ formulario.tipo_prestamo.errors }}
+
+            </div>
+
+
+            <!--
+                =========================================
+                MONTO
+                =========================================
+            -->
+
             <div class="campo">
 
                 {{ formulario.monto.label_tag }}
@@ -79,6 +108,12 @@
 
             </div>
 
+
+            <!--
+                =========================================
+                PORCENTAJE DE INTERÉS
+                =========================================
+            -->
 
             <div class="campo">
 
@@ -91,6 +126,12 @@
             </div>
 
 
+            <!--
+                =========================================
+                FRECUENCIA
+                =========================================
+            -->
+
             <div class="campo">
 
                 {{ formulario.frecuencia.label_tag }}
@@ -101,6 +142,12 @@
 
             </div>
 
+
+            <!--
+                =========================================
+                NÚMERO DE CUOTAS
+                =========================================
+            -->
 
             <div class="campo">
 
@@ -113,27 +160,62 @@
             </div>
 
 
-            <div id="resumen-prestamo" class="resumen-prestamo">
+            <!--
+                =========================================
+                RESUMEN
+                =========================================
+            -->
 
-                <h2>Resumen del préstamo</h2>
+            <div
+                id="resumen-prestamo"
+                class="resumen-prestamo"
+            >
+
+                <h2>
+                    Resumen del préstamo
+                </h2>
+
 
                 <p>
+
                     Interés:
-                    <strong id="resumen-interes">$0,00</strong>
+
+                    <strong id="resumen-interes">
+                        $0
+                    </strong>
+
                 </p>
 
+
                 <p>
+
                     Total a pagar:
-                    <strong id="resumen-total">$0,00</strong>
+
+                    <strong id="resumen-total">
+                        $0
+                    </strong>
+
                 </p>
 
+
                 <p>
+
                     Valor por cuota:
-                    <strong id="resumen-cuota">$0,00</strong>
+
+                    <strong id="resumen-cuota">
+                        $0
+                    </strong>
+
                 </p>
 
             </div>
 
+
+            <!--
+                =========================================
+                FECHA DEL PRÉSTAMO
+                =========================================
+            -->
 
             <div class="campo">
 
@@ -146,6 +228,12 @@
             </div>
 
 
+            <!--
+                =========================================
+                PRIMER COBRO
+                =========================================
+            -->
+
             <div class="campo">
 
                 {{ formulario.fecha_primer_cobro.label_tag }}
@@ -157,7 +245,10 @@
             </div>
 
 
-            <button type="submit" class="boton">
+            <button
+                type="submit"
+                class="boton"
+            >
 
                 Crear préstamo
 

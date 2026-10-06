@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Q, Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from clientes.models import Cliente
-from .forms import PrestamoForm, PagoForm
+from .forms import PrestamoForm, PrestamoEditarForm, PagoForm
 from .models import Prestamo, Cuota
 
 
@@ -16,6 +17,7 @@ def crear_prestamo(request):
         formulario = PrestamoForm(request.POST)
 
         if formulario.is_valid():
+
             formulario.save()
 
             return redirect('crear_prestamo')
@@ -27,7 +29,9 @@ def crear_prestamo(request):
     return render(
         request,
         'prestamos/crear_prestamo.html',
-        {'formulario': formulario}
+        {
+            'formulario': formulario
+        }
     )
 
 
@@ -49,14 +53,21 @@ def lista_prestamos(request):
         consulta = Q()
 
         for palabra in palabras:
+
             consulta &= (
-                Q(cliente__nombre__icontains=palabra) |
-                Q(cliente__apellido__icontains=palabra)
+                Q(
+                    cliente__nombre__icontains=palabra
+                ) |
+                Q(
+                    cliente__apellido__icontains=palabra
+                )
             )
 
         prestamos = prestamos.filter(consulta)
 
+
     prestamos_activos = []
+
 
     for prestamo in prestamos:
 
@@ -68,17 +79,23 @@ def lista_prestamos(request):
             total_prestamo += cuota.valor
 
             for pago in cuota.pagos.all():
+
                 total_pagado += pago.monto
+
 
         pendiente = total_prestamo - total_pagado
 
-        # Solo mostramos préstamos que todavía tienen saldo pendiente
+
         if pendiente > 0:
 
             if total_pagado > 0:
+
                 estado = 'abono'
+
             else:
+
                 estado = 'pendiente'
+
 
             prestamo.total_prestamo = total_prestamo
             prestamo.total_pagado = total_pagado
@@ -87,9 +104,11 @@ def lista_prestamos(request):
 
             prestamos_activos.append(prestamo)
 
-    # Si no estamos buscando, mostramos máximo los 10 más recientes
+
     if not texto:
+
         prestamos_activos = prestamos_activos[:10]
+
 
     return render(
         request,
@@ -109,13 +128,17 @@ def detalle_prestamo(request, prestamo_id):
         id=prestamo_id
     )
 
-    cuotas = Cuota.objects.filter(
-        prestamo=prestamo
-    ).prefetch_related(
-        'pagos'
-    ).order_by(
-        'numero'
+    cuotas = (
+        Cuota.objects
+        .filter(prestamo=prestamo)
+        .prefetch_related('pagos')
+        .order_by('numero')
     )
+
+    tiene_pagos = False
+
+    total_cuotas = 0
+    total_pagado = 0
 
     for cuota in cuotas:
 
@@ -124,28 +147,62 @@ def detalle_prestamo(request, prestamo_id):
             for pago in cuota.pagos.all()
         )
 
+        if abonado > 0:
+            tiene_pagos = True
+
         pendiente = cuota.valor - abonado
 
         if abonado <= 0:
+
             estado = 'pendiente'
 
         elif pendiente > 0:
+
             estado = 'abono'
 
         else:
+
             estado = 'pagada'
 
         cuota.abonado = abonado
-        cuota.pendiente = pendiente
+
+        cuota.pendiente = max(
+            pendiente,
+            0
+        )
+
         cuota.estado_calculado = estado
 
-    interes = (
-        prestamo.monto *
-        prestamo.porcentaje_interes /
-        100
+        total_cuotas += cuota.valor
+
+        total_pagado += abonado
+
+
+    # =========================================
+    # RESUMEN DEL PRÉSTAMO
+    # =========================================
+
+    if prestamo.tipo_prestamo == 'solo_intereses':
+
+        interes = total_cuotas
+
+        total = total_cuotas
+
+    else:
+
+        total = total_cuotas
+
+        interes = (
+            total_cuotas -
+            prestamo.monto
+        )
+
+
+    pendiente_total = (
+        total -
+        total_pagado
     )
 
-    total = prestamo.monto + interes
 
     return render(
         request,
@@ -154,7 +211,99 @@ def detalle_prestamo(request, prestamo_id):
             'prestamo': prestamo,
             'cuotas': cuotas,
             'interes': interes,
-            'total': total
+            'total': total,
+            'total_pagado': total_pagado,
+            'pendiente_total': max(
+                pendiente_total,
+                0
+            ),
+            'tiene_pagos': tiene_pagos,
+        }
+    )
+
+@login_required
+def editar_prestamo(request, prestamo_id):
+
+    prestamo = get_object_or_404(
+        Prestamo.objects.select_related('cliente'),
+        id=prestamo_id
+    )
+
+
+    # =========================================
+    # COMPROBAR SI EXISTEN PAGOS
+    # =========================================
+
+    tiene_pagos = Cuota.objects.filter(
+        prestamo=prestamo,
+        pagos__isnull=False
+    ).exists()
+
+
+    if tiene_pagos or not prestamo.activo:
+
+        return render(
+            request,
+            'prestamos/editar_prestamo_bloqueado.html',
+            {
+                'prestamo': prestamo,
+                'tiene_pagos': tiene_pagos,
+            }
+        )
+
+
+    # =========================================
+    # EDITAR
+    # =========================================
+
+    if request.method == 'POST':
+
+        formulario = PrestamoEditarForm(
+            request.POST,
+            instance=prestamo
+        )
+
+
+        if formulario.is_valid():
+
+            with transaction.atomic():
+
+                prestamo = formulario.save(
+                    commit=False
+                )
+
+                prestamo.save()
+
+
+                # =================================
+                # COMO NO HAY PAGOS,
+                # PODEMOS REGENERAR LAS CUOTAS
+                # =================================
+
+                prestamo.cuotas.all().delete()
+
+                prestamo.crear_cuotas()
+
+
+            return redirect(
+                'detalle_prestamo',
+                prestamo_id=prestamo.id
+            )
+
+
+    else:
+
+        formulario = PrestamoEditarForm(
+            instance=prestamo
+        )
+
+
+    return render(
+        request,
+        'prestamos/editar_prestamo.html',
+        {
+            'prestamo': prestamo,
+            'formulario': formulario,
         }
     )
 
@@ -162,20 +311,36 @@ def detalle_prestamo(request, prestamo_id):
 @login_required
 def buscar_clientes(request):
 
-    texto = request.GET.get('q', '').strip()
+    texto = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
 
     if not texto:
-        return JsonResponse([], safe=False)
+
+        return JsonResponse(
+            [],
+            safe=False
+        )
+
 
     palabras = texto.split()
 
     consulta = Q()
 
+
     for palabra in palabras:
+
         consulta &= (
-            Q(nombre__icontains=palabra) |
-            Q(apellido__icontains=palabra)
+            Q(
+                nombre__icontains=palabra
+            ) |
+            Q(
+                apellido__icontains=palabra
+            )
         )
+
 
     clientes = Cliente.objects.filter(
         consulta
@@ -184,15 +349,24 @@ def buscar_clientes(request):
         'apellido'
     )
 
+
     resultados = [
         {
             'id': cliente.id,
-            'nombre': f'{cliente.nombre} {cliente.apellido}'
+            'nombre': (
+                f'{cliente.nombre} '
+                f'{cliente.apellido}'
+            )
         }
+
         for cliente in clientes
     ]
 
-    return JsonResponse(resultados, safe=False)
+
+    return JsonResponse(
+        resultados,
+        safe=False
+    )
 
 
 @login_required
@@ -206,67 +380,109 @@ def registrar_pago(request, cuota_id):
         id=cuota_id
     )
 
+
     abonado = cuota.pagos.aggregate(
         total=Sum('monto')
     )['total'] or 0
 
+
     pendiente = cuota.valor - abonado
+
+
+    # =========================================
+    # COMPROBAR SI LA CUOTA YA ESTÁ PAGADA
+    # =========================================
+
+    if pendiente <= 0:
+
+        cuota.estado = 'pagada'
+        cuota.save()
+
+        return render(
+            request,
+            'prestamos/pago_bloqueado.html',
+            {
+                'cuota': cuota,
+            }
+        )
+
+
+    # =========================================
+    # REGISTRAR PAGO
+    # =========================================
 
     if request.method == 'POST':
 
-        formulario = PagoForm(request.POST)
+        formulario = PagoForm(
+            request.POST
+        )
+
 
         if formulario.is_valid():
 
-            monto = formulario.cleaned_data['monto']
+            monto = formulario.cleaned_data[
+                'monto'
+            ]
 
-            if monto <= 0:
 
-                formulario.add_error(
-                    'monto',
-                    'El monto debe ser mayor que cero.'
-                )
-
-            elif monto > pendiente:
+            if monto > pendiente:
 
                 formulario.add_error(
                     'monto',
-                    f'El pago no puede ser mayor al pendiente de ${pendiente:.2f}.'
+                    (
+                        'El pago no puede ser mayor '
+                        f'al pendiente de ${pendiente:.0f}.'
+                    )
                 )
+
 
             else:
 
-                pago = formulario.save(commit=False)
+                pago = formulario.save(
+                    commit=False
+                )
 
                 pago.cuota = cuota
 
                 pago.save()
 
-                nuevo_abonado = abonado + monto
+
+                nuevo_abonado = (
+                    abonado + monto
+                )
+
 
                 if nuevo_abonado >= cuota.valor:
 
                     cuota.estado = 'pagada'
+
                     cuota.save()
 
-                # Comprobar si todas las cuotas del préstamo
-                # están completamente pagadas
+
                 prestamo = cuota.prestamo
+
 
                 todas_pagadas = not prestamo.cuotas.filter(
                     estado='pendiente'
                 ).exists()
 
+
                 if todas_pagadas:
 
                     prestamo.activo = False
+
                     prestamo.save()
 
-                return redirect('dashboard')
+
+                return redirect(
+                    'dashboard'
+                )
+
 
     else:
 
         formulario = PagoForm()
+
 
     return render(
         request,

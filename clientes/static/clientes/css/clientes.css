@@ -54,6 +54,7 @@ h1 {
     border-radius: 10px;
     text-align: center;
 }
+
 .boton-editar {
     display: inline-block;
     background-color: #f59e0b;
@@ -63,6 +64,7 @@ h1 {
     border-radius: 6px;
     font-weight: bold;
 }
+
 .formulario {
     background-color: white;
     padding: 20px;
@@ -111,6 +113,7 @@ h1 {
     padding: 10px;
 }
 
+
 /* Botón volver */
 
 .boton-volver {
@@ -127,6 +130,47 @@ h1 {
 }
 
 .boton-volver:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* Buscador */
+
+.busqueda {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.busqueda input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: white;
+}
+
+.busqueda input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.busqueda button {
+    padding: 11px 16px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.busqueda button:hover {
     background-color: #1d4ed8;
 }
 
@@ -208,9 +252,30 @@ h1 {
     color: #dc2626;
     font-weight: 600;
 }
+
+
 .encabezado-formulario {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     gap: 10px;
+}
+
+
+/* Botón clientes inactivos */
+
+.boton-inactivos {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background-color: #64748b;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.boton-inactivos:hover {
+    background-color: #475569;
 }

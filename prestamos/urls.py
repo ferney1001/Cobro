@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 
+
 urlpatterns = [
 
     path(
@@ -17,15 +18,15 @@ urlpatterns = [
     ),
 
     path(
-        'buscar-clientes/',
-        views.buscar_clientes,
-        name='buscar_clientes'
+        'editar/<int:prestamo_id>/',
+        views.editar_prestamo,
+        name='editar_prestamo'
     ),
 
     path(
-        'cuota/<int:cuota_id>/pagar/',
-        views.registrar_pago,
-        name='registrar_pago'
+        'buscar-clientes/',
+        views.buscar_clientes,
+        name='buscar_clientes'
     ),
 
     path(
@@ -33,4 +34,11 @@ urlpatterns = [
         views.detalle_prestamo,
         name='detalle_prestamo'
     ),
+
+    path(
+        'pago/<int:cuota_id>/',
+        views.registrar_pago,
+        name='registrar_pago'
+    ),
+
 ]

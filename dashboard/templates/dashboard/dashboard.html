@@ -28,33 +28,37 @@
 
     <header class="barra-superior">
 
-        <div class="logo">
-            COBRO
-        </div>
+        <div class="barra-superior-contenido">
+
+            <div class="logo">
+                COBRO
+            </div>
 
 
-        <div class="usuario">
+            <div class="usuario">
 
-            <span>
-                {{ request.user.username }}
-            </span>
+                <span>
+                    {{ request.user.username }}
+                </span>
 
 
-            <form
-                method="post"
-                action="{% url 'logout' %}"
-            >
-
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="boton-salir"
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
                 >
-                    Salir
-                </button>
 
-            </form>
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="boton-salir"
+                    >
+                        Salir
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 
@@ -63,33 +67,37 @@
 
     <nav class="navegacion">
 
-        <a
-            href="{% url 'dashboard' %}"
-            class="activo"
-        >
-            Inicio
-        </a>
+        <div class="navegacion-contenido">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="activo"
+            >
+                Inicio
+            </a>
 
 
-        <a
-            href="{% url 'lista_clientes' %}"
-        >
-            Clientes
-        </a>
+            <a
+                href="{% url 'lista_clientes' %}"
+            >
+                Clientes
+            </a>
 
 
-        <a
-            href="{% url 'lista_prestamos' %}"
-        >
-            Préstamos
-        </a>
+            <a
+                href="{% url 'lista_prestamos' %}"
+            >
+                Préstamos
+            </a>
 
 
-        <a
-            href="#"
-        >
-            Contabilidad
-        </a>
+            <a
+                href="#"
+            >
+                Contabilidad
+            </a>
+
+        </div>
 
     </nav>
 
@@ -181,7 +189,6 @@
 
                             <div class="nombre-cliente">
 
-
                                 {% if item.estado == 'pagado' %}
 
                                     <span class="estado verde"></span>
@@ -205,6 +212,15 @@
 
                             <p>
                                 Préstamo #{{ item.cuota.prestamo.numero_prestamo }}
+
+                                ·
+
+                                {% if item.cuota.prestamo.tipo_prestamo == 'solo_intereses' %}
+                                    Solo intereses
+                                {% else %}
+                                    Capital + intereses
+                                {% endif %}
+
                                 · Cuota {{ item.cuota.numero }}
                                 de {{ item.cuota.prestamo.numero_cuotas }}
                             </p>
@@ -233,12 +249,17 @@
                         </div>
 
 
-                        <a
-                            href="{% url 'registrar_pago' item.cuota.id %}"
-                            class="boton-pago"
-                        >
-                            Registrar pago
-                        </a>
+                        {% if item.pendiente > 0 %}
+
+                            <a
+                                href="{% url 'registrar_pago' item.cuota.id %}"
+                                class="boton-pago"
+                            >
+                                Registrar pago
+                            </a>
+
+                        {% endif %}
+
 
                     </article>
 
@@ -331,7 +352,6 @@
 
                             <div class="nombre-cliente">
 
-
                                 {% if item.estado == 'pagado' %}
 
                                     <span class="estado verde"></span>
@@ -355,6 +375,15 @@
 
                             <p>
                                 Préstamo #{{ item.cuota.prestamo.numero_prestamo }}
+
+                                ·
+
+                                {% if item.cuota.prestamo.tipo_prestamo == 'solo_intereses' %}
+                                    Solo intereses
+                                {% else %}
+                                    Capital + intereses
+                                {% endif %}
+
                                 · Cuota {{ item.cuota.numero }}
                                 de {{ item.cuota.prestamo.numero_cuotas }}
                             </p>
@@ -383,12 +412,17 @@
                         </div>
 
 
-                        <a
-                            href="{% url 'registrar_pago' item.cuota.id %}"
-                            class="boton-pago"
-                        >
-                            Registrar pago
-                        </a>
+                        {% if item.pendiente > 0 %}
+
+                            <a
+                                href="{% url 'registrar_pago' item.cuota.id %}"
+                                class="boton-pago"
+                            >
+                                Registrar pago
+                            </a>
+
+                        {% endif %}
+
 
                     </article>
 
@@ -408,123 +442,9 @@
     </main>
 
 
-    <!-- =========================
-         FILTROS Y BÚSQUEDA
-    ========================== -->
-
-    <script>
-
-        const secciones = document.querySelectorAll('.seccion');
-
-
-        secciones.forEach(function(seccion) {
-
-            const botonesFiltro =
-                seccion.querySelectorAll('.filtro');
-
-            const buscador =
-                seccion.querySelector('.buscador');
-
-            const tarjetas =
-                seccion.querySelectorAll('.tarjeta-cobro');
-
-
-            let filtroActual = 'todos';
-
-
-            function aplicarFiltros() {
-
-                const texto =
-                    buscador.value
-                        .trim()
-                        .toLowerCase();
-
-
-                tarjetas.forEach(function(tarjeta) {
-
-                    const estado =
-                        tarjeta.dataset.estado;
-
-                    const cliente =
-                        tarjeta.dataset.cliente
-                            .toLowerCase();
-
-
-                    const coincideEstado =
-                        filtroActual === 'todos' ||
-                        estado === filtroActual;
-
-
-                    const coincideBusqueda =
-                        texto === '' ||
-                        cliente.includes(texto);
-
-
-                    if (
-                        coincideEstado &&
-                        coincideBusqueda
-                    ) {
-
-                        tarjeta.style.display = '';
-
-                    } else {
-
-                        tarjeta.style.display = 'none';
-
-                    }
-
-                });
-
-            }
-
-
-            botonesFiltro.forEach(function(boton) {
-
-                boton.addEventListener(
-                    'click',
-                    function() {
-
-                        filtroActual =
-                            boton.dataset.filtro;
-
-
-                        botonesFiltro.forEach(
-                            function(otroBoton) {
-
-                                otroBoton.classList.remove(
-                                    'activo'
-                                );
-
-                            }
-                        );
-
-
-                        boton.classList.add(
-                            'activo'
-                        );
-
-
-                        aplicarFiltros();
-
-                    }
-                );
-
-            });
-
-
-            buscador.addEventListener(
-                'input',
-                function() {
-
-                    aplicarFiltros();
-
-                }
-            );
-
-
-        });
-
-    </script>
+    <script
+        src="{% static 'dashboard/js/dashboard.js' %}"
+    ></script>
 
 
 </body>

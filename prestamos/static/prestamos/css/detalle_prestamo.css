@@ -58,6 +58,27 @@ body {
 }
 
 
+/* Botón editar */
+
+.boton-editar {
+    display: block;
+    width: fit-content;
+    margin: 14px auto 0;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.boton-editar:hover {
+    background-color: #1d4ed8;
+}
+
+
 /* Información principal */
 
 .tarjeta-resumen {
@@ -353,6 +374,16 @@ body {
 
     .encabezado-pago {
         font-size: 11px;
+    }
+
+
+    /* Botón editar en móvil */
+
+    .boton-editar {
+        width: fit-content;
+        margin: 12px auto 0;
+        padding: 12px 22px;
+        font-size: 14px;
     }
 
 }

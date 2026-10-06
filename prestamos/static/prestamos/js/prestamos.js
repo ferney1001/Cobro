@@ -5,109 +5,305 @@ const resultados = document.getElementById('resultados-clientes');
 const clienteSeleccionado = document.getElementById('id_cliente');
 
 
-buscador.addEventListener('input', function () {
+/*
+    =========================================
+    BUSCADOR DE CLIENTES
+    =========================================
+*/
 
-    const texto = buscador.value.trim();
+if (buscador && resultados && clienteSeleccionado) {
 
-    resultados.innerHTML = '';
+    buscador.addEventListener('input', function () {
 
-    clienteSeleccionado.value = '';
+        const texto = buscador.value.trim();
+
+        resultados.innerHTML = '';
+
+        clienteSeleccionado.value = '';
 
 
-    if (texto.length === 0) {
+        if (texto.length === 0) {
+            return;
+        }
+
+
+        fetch(
+            `/prestamos/buscar-clientes/?q=${encodeURIComponent(texto)}`
+        )
+            .then(response => response.json())
+
+            .then(clientes => {
+
+                if (clientes.length === 0) {
+
+                    resultados.innerHTML =
+                        '<div class="sin-resultados">' +
+                        'No se encontraron clientes' +
+                        '</div>';
+
+                    return;
+                }
+
+
+                clientes.forEach(cliente => {
+
+                    const elemento =
+                        document.createElement('button');
+
+                    elemento.type = 'button';
+
+                    elemento.className =
+                        'resultado-cliente';
+
+                    elemento.textContent =
+                        cliente.nombre;
+
+
+                    elemento.addEventListener(
+                        'click',
+                        function () {
+
+                            buscador.value =
+                                cliente.nombre;
+
+                            clienteSeleccionado.value =
+                                cliente.id;
+
+                            resultados.innerHTML = '';
+
+                        }
+                    );
+
+
+                    resultados.appendChild(elemento);
+
+                });
+
+            });
+
+    });
+
+}
+
+
+/*
+    =========================================
+    CAMPOS DEL PRÉSTAMO
+    =========================================
+*/
+
+const montoInput =
+    document.getElementById('id_monto');
+
+const interesInput =
+    document.getElementById(
+        'id_porcentaje_interes'
+    );
+
+const cuotasInput =
+    document.getElementById(
+        'id_numero_cuotas'
+    );
+
+const tipoPrestamoInput =
+    document.getElementById(
+        'id_tipo_prestamo'
+    );
+
+
+/*
+    =========================================
+    FORMULARIO
+    =========================================
+*/
+
+const formularioPrestamo =
+    montoInput
+        ? montoInput.closest('form')
+        : null;
+
+
+/*
+    =========================================
+    RESUMEN
+    =========================================
+*/
+
+const resumen =
+    document.getElementById(
+        'resumen-prestamo'
+    );
+
+const resumenInteres =
+    document.getElementById(
+        'resumen-interes'
+    );
+
+const resumenTotal =
+    document.getElementById(
+        'resumen-total'
+    );
+
+const resumenCuota =
+    document.getElementById(
+        'resumen-cuota'
+    );
+
+
+/*
+    =========================================
+    REDONDEAR AL MÚLTIPLO DE $50 MÁS CERCANO
+    =========================================
+*/
+
+function redondearA50(valor) {
+
+    return Math.round(valor / 50) * 50;
+
+}
+
+
+/*
+    =========================================
+    FORMATO DE PESOS
+    =========================================
+*/
+
+function formatoPesos(valor) {
+
+    return valor.toLocaleString(
+        'es-CO',
+        {
+            style: 'currency',
+            currency: 'COP',
+            maximumFractionDigits: 0
+        }
+    );
+
+}
+
+
+/*
+    =========================================
+    OBTENER MONTO NUMÉRICO
+    =========================================
+
+    Convierte:
+
+    10.000.000
+
+    en:
+
+    10000000
+*/
+
+function obtenerMontoNumerico() {
+
+    if (!montoInput) {
+        return NaN;
+    }
+
+    const valorLimpio =
+        montoInput.value.replace(/\D/g, '');
+
+    if (valorLimpio === '') {
+        return NaN;
+    }
+
+    return parseInt(
+        valorLimpio,
+        10
+    );
+
+}
+
+
+/*
+    =========================================
+    FORMATEAR MONTO VISUALMENTE
+    =========================================
+
+    Ejemplo:
+
+    10000000
+          ↓
+    10.000.000
+
+    Esto es solamente visual.
+*/
+
+function formatearMonto() {
+
+    if (!montoInput) {
         return;
     }
 
 
-    fetch(
-        `/prestamos/buscar-clientes/?q=${encodeURIComponent(texto)}`
-    )
-        .then(response => response.json())
-
-        .then(clientes => {
-
-            if (clientes.length === 0) {
-
-                resultados.innerHTML =
-                    '<div class="sin-resultados">' +
-                    'No se encontraron clientes' +
-                    '</div>';
-
-                return;
-            }
+    const valorLimpio =
+        montoInput.value.replace(/\D/g, '');
 
 
-            clientes.forEach(cliente => {
+    if (valorLimpio === '') {
 
-                const elemento = document.createElement('button');
+        montoInput.value = '';
 
-                elemento.type = 'button';
-
-                elemento.className = 'resultado-cliente';
-
-                elemento.textContent = cliente.nombre;
+        return;
+    }
 
 
-                elemento.addEventListener('click', function () {
-
-                    buscador.value = cliente.nombre;
-
-                    clienteSeleccionado.value = cliente.id;
-
-                    resultados.innerHTML = '';
-
-                });
+    const valor =
+        parseInt(
+            valorLimpio,
+            10
+        );
 
 
-                resultados.appendChild(elemento);
+    montoInput.value =
+        valor.toLocaleString('es-CO');
 
-            });
-
-        });
-
-});
+}
 
 
-const montoInput = document.getElementById('id_monto');
-
-const interesInput = document.getElementById(
-    'id_porcentaje_interes'
-);
-
-const cuotasInput = document.getElementById(
-    'id_numero_cuotas'
-);
-
-
-const resumen = document.getElementById(
-    'resumen-prestamo'
-);
-
-const resumenInteres = document.getElementById(
-    'resumen-interes'
-);
-
-const resumenTotal = document.getElementById(
-    'resumen-total'
-);
-
-const resumenCuota = document.getElementById(
-    'resumen-cuota'
-);
-
+/*
+    =========================================
+    ACTUALIZAR RESUMEN
+    =========================================
+*/
 
 function actualizarResumen() {
 
-    const monto = parseFloat(montoInput.value);
+    if (
+        !montoInput ||
+        !interesInput ||
+        !cuotasInput ||
+        !resumen ||
+        !resumenInteres ||
+        !resumenTotal ||
+        !resumenCuota
+    ) {
+        return;
+    }
 
-    const porcentaje = parseFloat(interesInput.value);
 
-    const cuotas = parseInt(cuotasInput.value);
+    const monto =
+        obtenerMontoNumerico();
 
+    const porcentaje =
+        parseFloat(interesInput.value);
+
+    const cuotas =
+        parseInt(cuotasInput.value);
+
+
+    /*
+        Si los datos todavía no están completos,
+        ocultamos el resumen.
+    */
 
     if (
-        !monto ||
+        isNaN(monto) ||
         monto <= 0 ||
+        isNaN(porcentaje) ||
         porcentaje < 0
     ) {
 
@@ -117,68 +313,269 @@ function actualizarResumen() {
     }
 
 
-    const interes = monto * porcentaje / 100;
+    /*
+        INTERÉS DE UN PERÍODO
 
-    const total = monto + interes;
+        Ejemplo:
+
+        $10.000.000
+        1.5%
+
+        = $150.000
+    */
+
+    const interesPeriodo =
+        monto * porcentaje / 100;
 
 
-    resumenInteres.textContent = interes.toLocaleString(
-        'es-CO',
-        {
-            style: 'currency',
-            currency: 'COP'
+    let interesTotal = 0;
+
+    let total = 0;
+
+    let valorCuota = 0;
+
+
+    /*
+        =========================================
+        CAPITAL + INTERESES EN CUOTAS
+        =========================================
+
+        Ejemplo:
+
+        $10.000.000
+        1.5%
+        12 cuotas
+
+        Interés por período:
+        $150.000
+
+        Interés total:
+        $1.800.000
+
+        Total:
+        $11.800.000
+    */
+
+    if (
+        !tipoPrestamoInput ||
+        tipoPrestamoInput.value === 'cuotas'
+    ) {
+
+        if (
+            !cuotas ||
+            cuotas <= 0
+        ) {
+
+            resumen.style.display = 'none';
+
+            return;
         }
-    );
 
 
-    resumenTotal.textContent = total.toLocaleString(
-        'es-CO',
-        {
-            style: 'currency',
-            currency: 'COP'
-        }
-    );
+        interesTotal =
+            interesPeriodo * cuotas;
 
 
-    if (cuotas && cuotas > 0) {
+        total =
+            monto + interesTotal;
 
-        const valorCuota = total / cuotas;
 
-        resumenCuota.textContent = valorCuota.toLocaleString(
-            'es-CO',
-            {
-                style: 'currency',
-                currency: 'COP'
-            }
-        );
-
-    } else {
-
-        resumenCuota.textContent = '$0,00';
+        valorCuota =
+            total / cuotas;
 
     }
 
 
-    resumen.style.display = 'block';
+    /*
+        =========================================
+        SOLO INTERESES
+        =========================================
+
+        Ejemplo:
+
+        $10.000.000
+        1.5%
+        12 cuotas
+
+        Cada cuota:
+        $150.000
+
+        Interés total:
+        $1.800.000
+
+        El capital NO se suma al total
+        de estas cuotas.
+    */
+
+    else if (
+        tipoPrestamoInput.value === 'solo_intereses'
+    ) {
+
+        if (
+            !cuotas ||
+            cuotas <= 0
+        ) {
+
+            resumen.style.display = 'none';
+
+            return;
+        }
+
+
+        interesTotal =
+            interesPeriodo * cuotas;
+
+
+        total =
+            interesTotal;
+
+
+        valorCuota =
+            interesPeriodo;
+
+    }
+
+
+    /*
+        Redondeamos la cuota mostrada
+        al múltiplo de $50 más cercano.
+    */
+
+    const cuotaRedondeada =
+        redondearA50(valorCuota);
+
+
+    resumenInteres.textContent =
+        formatoPesos(interesTotal);
+
+
+    resumenTotal.textContent =
+        formatoPesos(total);
+
+
+    resumenCuota.textContent =
+        formatoPesos(cuotaRedondeada);
+
+
+    resumen.style.display =
+        'block';
+
 }
 
 
-montoInput.addEventListener(
-    'input',
-    actualizarResumen
-);
+/*
+    =========================================
+    EVENTO DEL MONTO
+    =========================================
+*/
+
+if (montoInput) {
+
+    montoInput.addEventListener(
+        'input',
+        function () {
+
+            formatearMonto();
+
+            actualizarResumen();
+
+        }
+    );
+
+}
 
 
-interesInput.addEventListener(
-    'input',
-    actualizarResumen
-);
+/*
+    =========================================
+    EVENTO DEL PORCENTAJE
+    =========================================
+
+    IMPORTANTE:
+
+    El porcentaje NO se modifica.
+
+    Puede seguir siendo:
+
+    1.5
+    2
+    2.25
+*/
+
+if (interesInput) {
+
+    interesInput.addEventListener(
+        'input',
+        actualizarResumen
+    );
+
+}
 
 
-cuotasInput.addEventListener(
-    'input',
-    actualizarResumen
-);
+/*
+    =========================================
+    EVENTO DEL NÚMERO DE CUOTAS
+    =========================================
+*/
 
+if (cuotasInput) {
+
+    cuotasInput.addEventListener(
+        'input',
+        actualizarResumen
+    );
+
+}
+
+
+/*
+    =========================================
+    EVENTO DEL TIPO DE PRÉSTAMO
+    =========================================
+*/
+
+if (tipoPrestamoInput) {
+
+    tipoPrestamoInput.addEventListener(
+        'change',
+        actualizarResumen
+    );
+
+}
+
+
+/*
+    =========================================
+    ANTES DE GUARDAR
+    =========================================
+
+    El usuario puede ver:
+
+    10.000.000
+
+    pero Django recibe:
+
+    10000000
+*/
+
+if (formularioPrestamo && montoInput) {
+
+    formularioPrestamo.addEventListener(
+        'submit',
+        function () {
+
+            montoInput.value =
+                montoInput.value.replace(/\D/g, '');
+
+        }
+    );
+
+}
+
+
+/*
+    =========================================
+    EJECUTAR AL CARGAR
+    =========================================
+*/
 
 actualizarResumen();

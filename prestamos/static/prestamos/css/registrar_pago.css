@@ -6,131 +6,143 @@
 body {
     margin: 0;
 
-    font-family: Arial, sans-serif;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-    background-color: #eef2f7;
+    background-color: #f4f6f8;
 
     color: #1f2937;
 }
 
 
-/* =========================
+/* =========================================
    ENCABEZADO
-========================= */
+========================================= */
 
 .encabezado {
     background-color: #2563eb;
 
     color: white;
 
-    padding: 20px 16px;
-
-    text-align: center;
+    padding: 18px 20px;
 }
+
+
+.encabezado-contenido {
+    width: 100%;
+    max-width: 620px;
+
+    margin: 0 auto;
+}
+
 
 .encabezado h1 {
     margin: 0;
 
-    font-size: 26px;
+    font-size: 24px;
+    font-weight: 700;
 }
 
 
-/* =========================
+/* =========================================
    CONTENEDOR
-========================= */
+========================================= */
 
 .contenedor {
     width: 100%;
+    max-width: 620px;
 
-    max-width: 650px;
+    margin: 0 auto;
 
-    margin: 25px auto;
-
-    padding: 0 20px;
+    padding: 20px 16px 40px;
 }
 
 
-/* =========================
-   BOTÓN VOLVER
-========================= */
+/* =========================================
+   VOLVER
+========================================= */
 
 .boton-volver {
     display: inline-flex;
 
     align-items: center;
+    justify-content: center;
 
-    min-height: 44px;
+    min-height: 42px;
 
-    margin-bottom: 18px;
-
+    margin-bottom: 16px;
     padding: 9px 14px;
-
-    border-radius: 8px;
 
     background-color: #ffffff;
 
-    border: 1px solid #dbe3ec;
+    border: 1px solid #d9dee5;
+    border-radius: 8px;
 
     color: #374151;
 
     text-decoration: none;
 
     font-size: 14px;
-
-    font-weight: bold;
+    font-weight: 600;
 }
+
 
 .boton-volver:hover {
     background-color: #f8fafc;
 }
 
 
-/* =========================
-   TARJETA PRINCIPAL
-========================= */
+/* =========================================
+   TARJETA
+========================================= */
 
 .tarjeta {
     background-color: #ffffff;
 
-    border: 1px solid #e2e8f0;
+    border: 1px solid #e1e5ea;
+    border-radius: 12px;
 
-    border-radius: 14px;
-
-    padding: 24px;
-
-    box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.06);
+    padding: 22px;
 }
 
 
-/* =========================
+/* =========================================
    CLIENTE
-========================= */
+========================================= */
 
 .cliente {
-    margin-bottom: 22px;
+    padding-bottom: 18px;
+
+    margin-bottom: 18px;
+
+    border-bottom: 1px solid #edf0f3;
 }
+
 
 .cliente h2 {
-    margin: 0 0 7px 0;
-
-    font-size: 22px;
+    margin: 0 0 6px;
 
     color: #111827;
+
+    font-size: 21px;
+    font-weight: 700;
 }
+
 
 .cliente p {
     margin: 0;
 
-    color: #64748b;
+    color: #6b7280;
 
     font-size: 14px;
 }
 
 
-/* =========================
+/* =========================================
    RESUMEN
-========================= */
+========================================= */
 
 .resumen {
     display: grid;
@@ -143,74 +155,93 @@ body {
     margin-bottom: 25px;
 }
 
-.dato {
-    padding: 13px;
 
-    border-radius: 9px;
+.dato {
+    padding: 13px 11px;
 
     background-color: #f8fafc;
 
-    border: 1px solid #eef2f7;
+    border: 1px solid #e8ecf1;
+    border-radius: 9px;
 }
+
 
 .dato span {
     display: block;
 
     margin-bottom: 6px;
 
-    color: #64748b;
+    color: #6b7280;
 
     font-size: 12px;
-
-    font-weight: bold;
+    font-weight: 600;
 }
+
 
 .dato strong {
     display: block;
 
-    color: #1f2937;
+    color: #111827;
 
     font-size: 16px;
+    font-weight: 700;
 }
+
+
+/* =========================================
+   PENDIENTE
+========================================= */
 
 .dato.pendiente {
     background-color: #eff6ff;
 
-    border-color: #dbeafe;
+    border-color: #bfdbfe;
 }
+
+
+.dato.pendiente span {
+    color: #2563eb;
+}
+
 
 .dato.pendiente strong {
-    color: #1e40af;
+    color: #1d4ed8;
 }
 
 
-/* =========================
+/* =========================================
    FORMULARIO
-========================= */
+========================================= */
 
 .formulario {
     display: flex;
 
     flex-direction: column;
 
-    gap: 18px;
+    gap: 21px;
 }
+
 
 .campo {
     display: flex;
 
     flex-direction: column;
 
-    gap: 7px;
+    gap: 8px;
 }
+
 
 .campo label {
     color: #374151;
 
     font-size: 14px;
-
-    font-weight: bold;
+    font-weight: 700;
 }
+
+
+/* =========================================
+   INPUTS
+========================================= */
 
 .campo input {
     width: 100%;
@@ -219,16 +250,21 @@ body {
 
     padding: 11px 13px;
 
-    border: 1px solid #cbd5e1;
-
-    border-radius: 9px;
-
     background-color: #ffffff;
 
-    color: #1f2937;
+    border: 1px solid #cfd6df;
+    border-radius: 8px;
+
+    color: #111827;
 
     font-size: 16px;
 }
+
+
+.campo input:hover {
+    border-color: #aeb7c2;
+}
+
 
 .campo input:focus {
     outline: none;
@@ -236,20 +272,156 @@ body {
     border-color: #2563eb;
 
     box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.12);
+        0 0 0 3px
+        rgba(37, 99, 235, 0.12);
 }
 
 
-/* =========================
+/* =========================================
+   PAGAR CUOTA COMPLETA
+========================================= */
+
+.boton-pago-completo {
+    width: 100%;
+
+    min-height: 50px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 12px 15px;
+
+    background-color: #ffffff;
+
+    border: 2px solid #16a34a;
+    border-radius: 8px;
+
+    color: #166534;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.05s ease;
+}
+
+.boton-pago-completo strong {
+    white-space: nowrap;
+
+    color: #15803d;
+
+    font-size: 15px;
+}
+
+.boton-pago-completo:hover {
+    background-color: #f0fdf4;
+
+    border-color: #15803d;
+}
+
+.boton-pago-completo:active {
+    background-color: #dcfce7;
+
+    transform: translateY(1px);
+}
+
+
+.boton-pago-completo strong {
+    white-space: nowrap;
+
+    color: #15803d;
+
+    font-size: 15px;
+}
+
+
+.boton-pago-completo:hover {
+    background-color: #dcfce7;
+
+    border-color: #4ade80;
+}
+
+
+.boton-pago-completo:active {
+    background-color: #bbf7d0;
+}
+
+
+/* =========================================
+   BOTÓN FECHA ACTUAL
+========================================= */
+
+.boton-hoy {
+    align-self: flex-start;
+
+    min-height: 42px;
+
+    padding: 8px 14px;
+
+    background-color: #f8fafc;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    color: #374151;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+
+.boton-hoy:hover {
+    background-color: #f1f5f9;
+
+    border-color: #94a3b8;
+}
+
+
+.boton-hoy:active {
+    background-color: #e2e8f0;
+}
+
+
+/* =========================================
+   TEXTO DE AYUDA
+========================================= */
+
+.ayuda {
+    margin-top: -2px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================
    ERRORES
-========================= */
+========================================= */
 
 .error {
     padding: 9px 11px;
 
-    border-radius: 8px;
-
     background-color: #fef2f2;
+
+    border: 1px solid #fecaca;
+    border-radius: 7px;
 
     color: #b91c1c;
 
@@ -257,67 +429,119 @@ body {
 }
 
 
-/* =========================
-   BOTÓN CONFIRMAR
-========================= */
+/* =========================================
+   CONFIRMAR
+========================================= */
 
 .boton-confirmar {
     width: 100%;
 
-    min-height: 48px;
+    min-height: 50px;
 
-    margin-top: 5px;
+    margin-top: 2px;
 
-    border: none;
-
-    border-radius: 9px;
+    padding: 11px 16px;
 
     background-color: #2563eb;
+    
+    text-decoration: none;
 
-    color: white;
+    border: none;
+    border-radius: 8px;
 
-    font-size: 15px;
+    color: #ffffff;
 
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 700;
 
     cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.05s ease;
 }
+
 
 .boton-confirmar:hover {
     background-color: #1d4ed8;
 }
 
 
-/* =========================
-   CELULAR
-========================= */
+.boton-confirmar:active {
+    background-color: #1e40af;
+
+    transform: translateY(1px);
+}
+
+
+/* =========================================
+   MÓVIL
+========================================= */
 
 @media (max-width: 600px) {
 
     .encabezado {
-        padding: 17px 14px;
+        padding: 16px;
     }
+
 
     .encabezado h1 {
-        font-size: 22px;
+        font-size: 21px;
     }
+
 
     .contenedor {
-        margin: 20px auto;
-
-        padding: 0 12px;
+        padding: 16px 12px 30px;
     }
+
 
     .tarjeta {
         padding: 18px;
+
+        border-radius: 10px;
     }
 
+
     .cliente h2 {
-        font-size: 20px;
+        font-size: 19px;
     }
+
 
     .resumen {
         grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+
+
+    .dato {
+        padding: 12px;
+    }
+
+
+    .dato strong {
+        font-size: 17px;
+    }
+
+
+    .boton-pago-completo {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        justify-content: center;
+
+        gap: 4px;
+    }
+
+
+    .boton-pago-completo strong {
+        font-size: 16px;
+    }
+
+
+    .boton-confirmar {
+        min-height: 52px;
     }
 
 }

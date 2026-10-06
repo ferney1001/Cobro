@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pago no disponible - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/registrar_pago.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <div class="encabezado-contenido">
+
+            <h1>
+                Registrar pago
+            </h1>
+
+        </div>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="boton-volver"
+        >
+            ← Volver al inicio
+        </a>
+
+
+        <section class="tarjeta">
+
+
+            <div class="cliente">
+
+                <h2>
+                    {{ cuota.prestamo.cliente.nombre }}
+                    {{ cuota.prestamo.cliente.apellido }}
+                </h2>
+
+                <p>
+                    Préstamo #{{ cuota.prestamo.numero_prestamo }}
+                    · Cuota {{ cuota.numero }}
+                    de {{ cuota.prestamo.numero_cuotas }}
+                </p>
+
+            </div>
+
+
+            <div class="aviso">
+
+                <strong>
+                    Esta cuota ya está pagada
+                </strong>
+
+
+                <p>
+                    No se pueden registrar más pagos
+                    porque el valor total de esta cuota
+                    ya fue cubierto.
+                </p>
+
+            </div>
+
+
+            <div class="acciones">
+
+                <a
+                    href="{% url 'detalle_prestamo' cuota.prestamo.id %}"
+                    class="boton-confirmar"
+                >
+                    Ver préstamo
+                </a>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

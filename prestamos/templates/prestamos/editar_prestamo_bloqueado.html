@@ -1,0 +1,120 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Editar préstamo - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/editar_prestamo.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <div class="encabezado-contenido">
+
+            <h1>
+                Editar préstamo
+            </h1>
+
+        </div>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <a
+            href="{% url 'detalle_prestamo' prestamo.id %}"
+            class="boton-volver"
+        >
+            ← Volver al préstamo
+        </a>
+
+
+        <section class="tarjeta">
+
+
+            <div class="informacion">
+
+                <h2>
+                    Préstamo #{{ prestamo.numero_prestamo }}
+                </h2>
+
+
+                <p class="cliente">
+
+                    {{ prestamo.cliente.nombre }}
+                    {{ prestamo.cliente.apellido }}
+
+                </p>
+
+
+                <div class="aviso">
+
+                    <strong>
+                        Este préstamo no se puede modificar
+                    </strong>
+
+
+                    {% if tiene_pagos %}
+
+                        <p>
+                            Este préstamo ya tiene pagos registrados.
+                            Para proteger el historial de pagos,
+                            sus condiciones no pueden modificarse.
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            Este préstamo ya está completamente pagado
+                            y se conserva como parte del historial.
+                            Sus condiciones no pueden modificarse.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="acciones">
+
+                <a
+                    href="{% url 'detalle_prestamo' prestamo.id %}"
+                    class="boton-guardar"
+                >
+                    Ver préstamo
+                </a>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

@@ -52,6 +52,34 @@
         </div>
 
 
+        <a
+            href="{% url 'lista_clientes_inactivos' %}"
+            class="boton-inactivos"
+        >
+            Ver clientes inactivos
+        </a>
+
+
+        <form
+            method="get"
+            class="busqueda"
+        >
+
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="🔎 Buscar cliente..."
+                autocomplete="off"
+            >
+
+            <button type="submit">
+                Buscar
+            </button>
+
+        </form>
+
+
         {% for cliente in clientes %}
 
             <div class="cliente">
@@ -93,15 +121,23 @@
             <div class="sin-clientes">
 
                 <p>
-                    No hay clientes registrados.
+                    {% if busqueda %}
+                        No se encontraron clientes con esa búsqueda.
+                    {% else %}
+                        No hay clientes registrados.
+                    {% endif %}
                 </p>
 
 
-                <a
-                    href="{% url 'crear_cliente' %}"
-                >
-                    Crear el primer cliente
-                </a>
+                {% if not busqueda %}
+
+                    <a
+                        href="{% url 'crear_cliente' %}"
+                    >
+                        Crear el primer cliente
+                    </a>
+
+                {% endif %}
 
             </div>
 

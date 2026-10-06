@@ -148,6 +148,16 @@
                     </span>
 
                 </div>
+                {% if prestamo.activo %}
+
+                <a
+                    href="{% url 'editar_prestamo' prestamo.id %}"
+                    class="boton-editar"
+                >
+                    ✏️ Editar préstamo
+                </a>
+
+                {% endif %}
 
 
             </div>

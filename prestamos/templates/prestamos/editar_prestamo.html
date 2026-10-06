@@ -1,0 +1,302 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Editar préstamo - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/editar_prestamo.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <div class="encabezado-contenido">
+
+            <h1>
+                Editar préstamo
+            </h1>
+
+        </div>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <!-- VOLVER -->
+
+        <a
+            href="{% url 'detalle_prestamo' prestamo.id %}"
+            class="boton-volver"
+        >
+            ← Volver al préstamo
+        </a>
+
+
+        <section class="tarjeta">
+
+
+            <!-- INFORMACIÓN -->
+
+            <div class="informacion">
+
+                <h2>
+                    Préstamo #{{ prestamo.numero_prestamo }}
+                </h2>
+
+                <p class="cliente">
+                    {{ prestamo.cliente.nombre }}
+                    {{ prestamo.cliente.apellido }}
+                </p>
+
+
+                <div class="aviso">
+
+                    <strong>
+                        Puedes modificar este préstamo
+                    </strong>
+
+                    <p>
+                        Este préstamo todavía no tiene pagos registrados.
+                        Al guardar los cambios, las cuotas actuales se
+                        reemplazarán por unas nuevas según las condiciones
+                        que selecciones.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORMULARIO -->
+
+            <form
+                method="post"
+                class="formulario"
+            >
+
+                {% csrf_token %}
+
+
+                <!-- TIPO DE PRÉSTAMO -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.tipo_prestamo.id_for_label }}"
+                    >
+                        Tipo de préstamo
+                    </label>
+
+                    {{ formulario.tipo_prestamo }}
+
+                    {% if formulario.tipo_prestamo.errors %}
+
+                        <div class="error">
+                            {{ formulario.tipo_prestamo.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- MONTO -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.monto.id_for_label }}"
+                    >
+                        Monto prestado
+                    </label>
+
+                    {{ formulario.monto }}
+
+                    {% if formulario.monto.errors %}
+
+                        <div class="error">
+                            {{ formulario.monto.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- INTERÉS -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.porcentaje_interes.id_for_label }}"
+                    >
+                        Porcentaje de interés
+                    </label>
+
+                    {{ formulario.porcentaje_interes }}
+
+                    {% if formulario.porcentaje_interes.errors %}
+
+                        <div class="error">
+                            {{ formulario.porcentaje_interes.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- FRECUENCIA -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.frecuencia.id_for_label }}"
+                    >
+                        Frecuencia de cobro
+                    </label>
+
+                    {{ formulario.frecuencia }}
+
+                    {% if formulario.frecuencia.errors %}
+
+                        <div class="error">
+                            {{ formulario.frecuencia.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- NÚMERO DE CUOTAS -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.numero_cuotas.id_for_label }}"
+                    >
+                        Número de cuotas
+                    </label>
+
+                    {{ formulario.numero_cuotas }}
+
+                    {% if formulario.numero_cuotas.errors %}
+
+                        <div class="error">
+                            {{ formulario.numero_cuotas.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- FECHA DEL PRÉSTAMO -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.fecha_prestamo.id_for_label }}"
+                    >
+                        Fecha del préstamo
+                    </label>
+
+                    {{ formulario.fecha_prestamo }}
+
+                    {% if formulario.fecha_prestamo.errors %}
+
+                        <div class="error">
+                            {{ formulario.fecha_prestamo.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- PRIMER COBRO -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.fecha_primer_cobro.id_for_label }}"
+                    >
+                        Fecha del primer cobro
+                    </label>
+
+                    {{ formulario.fecha_primer_cobro }}
+
+                    {% if formulario.fecha_primer_cobro.errors %}
+
+                        <div class="error">
+                            {{ formulario.fecha_primer_cobro.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ERRORES GENERALES -->
+
+                {% if formulario.non_field_errors %}
+
+                    <div class="error">
+
+                        {{ formulario.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- BOTONES -->
+
+                <div class="acciones">
+
+                    <a
+                        href="{% url 'detalle_prestamo' prestamo.id %}"
+                        class="boton-cancelar"
+                    >
+                        Cancelar
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="boton-guardar"
+                    >
+                        Guardar cambios
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
