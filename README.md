@@ -225,15 +225,4 @@ GitHub:
 
 https://github.com/ferney1001
 
-```
 
-### Para tu hoja de vida
-
-Este proyecto te puede servir bastante como **proyecto de portafolio**, especialmente porque no es solamente "hice una página en Django". Tiene cosas interesantes para un perfil junior:
-
-**Python + Django + ORM + SQLite + autenticación + relaciones entre modelos + lógica de negocio + fechas + pagos parciales + Git.**
-
-Y cuando terminemos **Contabilidad**, podemos mejorar todavía más el README para mostrar consultas, reportes y manejo de información financiera.
-
-Solo una cosa importante antes de subir este README: **no pongas contraseñas, claves API, `SECRET_KEY` ni archivos `.env` en GitHub**. Tu repositorio es público.
-```
