@@ -63,4 +63,202 @@ El proyecto fue desarrollado como una aplicación práctica para solucionar nece
 * Permite múltiples pagos sobre una misma cuota.
 * Conservación permanente del historial de movimientos.
 * Cálculo automático del valor abonado y saldo pendiente.
-* Una cuota cambia a pagada cuando sus pagos completa
+* Una cuota cambia a pagada cuando sus pagos completan el valor total de la cuota.
+* Los pagos pueden registrarse posteriormente con su fecha y hora correspondiente.
+
+### 📊 Dashboard
+
+El panel principal permite visualizar rápidamente:
+
+* Cobros programados para el día actual.
+* Cuotas atrasadas.
+* Cuotas con abonos.
+* Cuotas pagadas.
+* Saldo pendiente.
+* Acceso directo al registro de pagos.
+
+El dashboard diferencia los cobros del día actual de las cuotas que ya se encuentran atrasadas.
+
+### 📚 Historial de préstamos
+
+Los préstamos completamente pagados permanecen almacenados para conservar el historial financiero.
+
+El sistema permite consultar los préstamos mediante dos secciones:
+
+* **Préstamos por pagar.**
+* **Préstamos pagados.**
+
+La búsqueda de préstamos puede realizarse por nombre o apellido del cliente.
+
+Los préstamos completamente pagados pueden eliminarse manualmente mediante una confirmación previa. Al eliminarlos, también se eliminan sus cuotas y registros de pago asociados.
+
+Los préstamos que todavía tienen saldo pendiente no pueden eliminarse.
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+* **Python 3.13**
+* **Django 6**
+* **SQLite**
+* **HTML5**
+* **CSS3**
+* **JavaScript**
+* **Git**
+* **GitHub**
+
+## 🧠 Conceptos aplicados
+
+Durante el desarrollo se han aplicado conceptos de:
+
+* Programación orientada a objetos.
+* Modelado de datos.
+* Relaciones entre modelos.
+* ORM de Django.
+* CRUD.
+* Autenticación y autorización.
+* Formularios de Django.
+* Validación de datos.
+* Consultas con Django ORM.
+* Manejo de fechas.
+* Cálculos financieros con `Decimal`.
+* Separación entre lógica de negocio y presentación.
+* Diseño responsive.
+* Control de versiones con Git.
+
+## 🗂️ Estructura del proyecto
+
+```text
+Cobro/
+│
+├── clientes/
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│
+├── dashboard/
+│   ├── views.py
+│   ├── urls.py
+│   ├── templates/
+│   └── templatetags/
+│
+├── prestamos/
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│
+├── config/
+│   ├── settings.py
+│   └── urls.py
+│
+├── static/
+│
+├── manage.py
+├── requirements.txt
+└── README.md
+```
+
+## 📌 Estado actual
+
+El proyecto se encuentra en desarrollo.
+
+Actualmente cuenta con:
+
+* Autenticación.
+* Gestión de clientes.
+* Activación y desactivación de clientes.
+* Gestión de préstamos.
+* Tipos de préstamo: capital + intereses y solo intereses.
+* Frecuencias de cobro diaria, semanal, quincenal y mensual.
+* Generación automática de cuotas.
+* Cálculo de intereses.
+* Registro de pagos.
+* Pagos parciales.
+* Múltiples pagos por cuota.
+* Historial de pagos.
+* Dashboard de cobros.
+* Control de cuotas atrasadas.
+* Control de préstamos por pagar.
+* Historial de préstamos pagados.
+* Eliminación de préstamos completamente pagados.
+* Diseño responsive para dispositivos móviles.
+
+### Próximas funcionalidades
+
+* Módulo de contabilidad.
+* Resumen general de dinero prestado y cobrado.
+* Contabilidad por cliente.
+* Separación entre capital recuperado e intereses recibidos.
+* Cálculo de capital pendiente.
+* Historial general de movimientos.
+* Filtros por fechas.
+* Reportes financieros.
+* Exportación a Excel.
+* Generación de PDF.
+* Mejoras de seguridad para despliegue.
+* Publicación de la aplicación en un servidor.
+
+## 💻 Instalación local
+
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/ferney1001/Cobro.git
+cd Cobro
+```
+
+Crear y activar el entorno virtual:
+
+### Windows
+
+```powershell
+python -m venv venv
+venv\Scripts\activate
+```
+
+Instalar las dependencias:
+
+```powershell
+pip install -r requirements.txt
+```
+
+Aplicar las migraciones:
+
+```powershell
+python manage.py migrate
+```
+
+Crear un usuario administrador:
+
+```powershell
+python manage.py createsuperuser
+```
+
+Ejecutar el servidor:
+
+```powershell
+python manage.py runserver
+```
+
+La aplicación estará disponible localmente en:
+
+```text
+http://127.0.0.1:8000/
+```
+
+## 👨‍💻 Autor
+
+**Ferney Stiven Rueda Gonzalez**
+
+Ingeniero de Sistemas | Desarrollador Junior
+
+Interesado principalmente en desarrollo con **Python, Java y bases de datos**.
+
+GitHub:
+
+```text
+https://github.com/ferney1001
+```
