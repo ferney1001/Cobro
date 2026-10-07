@@ -52,6 +52,7 @@
                 Préstamos registrados
             </h2>
 
+
             <a
                 href="{% url 'crear_prestamo' %}"
                 class="boton-nuevo"
@@ -61,6 +62,8 @@
 
         </div>
 
+
+        <!-- BUSCADOR -->
 
         <form
             method="get"
@@ -72,7 +75,16 @@
                 name="q"
                 value="{{ busqueda }}"
                 placeholder="🔎 Buscar cliente..."
+                autocomplete="off"
             >
+
+
+            <input
+                type="hidden"
+                name="estado"
+                value="{{ estado }}"
+            >
+
 
             <button type="submit">
                 Buscar
@@ -80,6 +92,42 @@
 
         </form>
 
+
+        <!-- FILTROS -->
+
+        <div class="filtros-prestamos">
+
+
+            <a
+                href="?estado=por_pagar{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}"
+                class="
+                    filtro-prestamo
+                    {% if estado == 'por_pagar' %}
+                        filtro-activo
+                    {% endif %}
+                "
+            >
+                Préstamos por pagar
+            </a>
+
+
+            <a
+                href="?estado=pagados{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}"
+                class="
+                    filtro-prestamo
+                    {% if estado == 'pagados' %}
+                        filtro-activo
+                    {% endif %}
+                "
+            >
+                Préstamos pagados
+            </a>
+
+
+        </div>
+
+
+        <!-- LISTA -->
 
         <section class="lista-prestamos">
 
@@ -100,59 +148,112 @@
 
 
                         <p>
+
                             Préstamo #{{ prestamo.numero_prestamo }}
 
                             ·
 
                             {% if prestamo.tipo_prestamo == 'solo_intereses' %}
+
                                 Solo intereses
+
                             {% else %}
+
                                 Capital + intereses
+
                             {% endif %}
+
                         </p>
 
 
                         <p>
+
                             Monto:
+
                             <strong>
                                 ${{ prestamo.monto|dinero }}
                             </strong>
+
                         </p>
 
 
                         <p>
+
                             Interés:
                             {{ prestamo.porcentaje_interes }}%
+
                         </p>
 
 
                         <p>
+
                             Frecuencia:
                             {{ prestamo.get_frecuencia_display }}
+
                         </p>
 
 
                         <p>
+
                             Cuotas:
                             {{ prestamo.numero_cuotas }}
+
                         </p>
 
 
                         <p>
-                            Fecha:
+                            Fecha del préstamo:
                             {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
                         </p>
+
+                        {% if prestamo.estado_calculado == 'pagado' %}
+
+                            <p class="estado-prestamo estado-pagado">
+                                ✓ PRÉSTAMO PAGADO
+                            </p>
+
+                        {% elif prestamo.estado_calculado == 'abono' %}
+
+                            <p class="estado-prestamo estado-abono">
+                                ABONO
+                            </p>
+
+                        {% else %}
+
+                            <p class="estado-prestamo estado-pendiente">
+                                PENDIENTE
+                            </p>
+
+                        {% endif %}
 
 
                     </div>
 
 
-                    <a
-                        href="{% url 'detalle_prestamo' prestamo.id %}"
-                        class="boton-detalle"
-                    >
-                        Ver préstamo
-                    </a>
+                    <div class="acciones-prestamo">
+
+
+                        <a
+                            href="{% url 'detalle_prestamo' prestamo.id %}"
+                            class="boton-detalle"
+                        >
+                            Ver préstamo
+                        </a>
+
+
+                        {% if estado == 'pagados' %}
+
+                            <a
+                                href="{% url 'eliminar_prestamo' prestamo.id %}"
+                                class="boton-eliminar"
+                            >
+                                Eliminar
+                            </a>
+
+                        {% endif %}
+
+
+                    </div>
 
 
                 </article>
@@ -162,7 +263,17 @@
 
 
                 <p class="sin-prestamos">
-                    No hay préstamos registrados.
+
+                    {% if estado == 'pagados' %}
+
+                        No hay préstamos pagados.
+
+                    {% else %}
+
+                        No hay préstamos por pagar.
+
+                    {% endif %}
+
                 </p>
 
 

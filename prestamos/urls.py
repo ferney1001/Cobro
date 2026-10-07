@@ -30,6 +30,12 @@ urlpatterns = [
     ),
 
     path(
+        'eliminar/<int:prestamo_id>/',
+        views.eliminar_prestamo,
+        name='eliminar_prestamo'
+    ),
+
+    path(
         '<int:prestamo_id>/',
         views.detalle_prestamo,
         name='detalle_prestamo'

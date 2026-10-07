@@ -151,6 +151,69 @@ body {
 
 
 /* =========================
+   FILTROS DE PRÉSTAMOS
+========================= */
+
+.filtros-prestamos {
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    flex-wrap: wrap;
+}
+
+
+.filtro-prestamo {
+    flex: 1;
+
+    min-width: 160px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+
+    padding: 12px 16px;
+
+    box-sizing: border-box;
+
+    background-color: #e5e7eb;
+
+    color: #374151;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.filtro-prestamo:hover {
+    background-color: #d1d5db;
+}
+
+
+.filtro-prestamo.filtro-activo {
+    background-color: #2563eb;
+
+    color: white;
+}
+
+
+/* =========================
    LISTA DE PRÉSTAMOS
 ========================= */
 
@@ -211,6 +274,18 @@ body {
     margin-bottom: 18px;
 }
 
+
+.informacion h2 {
+    margin: 0 0 16px 0;
+
+    font-size: 22px;
+
+    color: #111827;
+
+    line-height: 1.3;
+}
+
+
 .informacion h3 {
     margin: 0 0 8px 0;
 
@@ -261,6 +336,67 @@ body {
 
 
 /* =========================
+   ESTADOS DEL PRÉSTAMO
+========================= */
+
+.estado-prestamo {
+    display: inline-block;
+
+    margin-top: 12px !important;
+
+    padding: 7px 10px;
+
+    border-radius: 6px;
+
+    font-size: 13px !important;
+
+    font-weight: bold;
+}
+
+
+/* PENDIENTE */
+
+.estado-pendiente {
+    background-color: #fee2e2;
+
+    color: #b91c1c;
+}
+
+
+/* ABONO */
+
+.estado-abono {
+    background-color: #fef3c7;
+
+    color: #b45309;
+}
+
+
+/* PAGADO */
+
+.estado-pagado {
+    background-color: #dcfce7;
+
+    color: #15803d;
+}
+
+
+/* =========================
+   ACCIONES
+========================= */
+
+.acciones-prestamo {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin-top: auto;
+}
+
+
+/* =========================
    BOTÓN DETALLE
 ========================= */
 
@@ -270,7 +406,9 @@ body {
     align-items: center;
     justify-content: center;
 
-    width: 100%;
+    flex: 1;
+
+    min-width: 130px;
 
     min-height: 44px;
 
@@ -299,6 +437,92 @@ body {
 
 
 /* =========================
+   BOTÓN ELIMINAR
+========================= */
+
+.boton-eliminar {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 120px;
+
+    min-height: 44px;
+
+    padding: 11px 16px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background-color: #dc2626;
+
+    color: white;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+
+.boton-eliminar:hover {
+    background-color: #b91c1c;
+}
+
+
+/* =========================
+   BOTÓN CANCELAR
+========================= */
+
+.boton-cancelar {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 120px;
+
+    min-height: 44px;
+
+    padding: 11px 16px;
+
+    border-radius: 8px;
+
+    background-color: #e5e7eb;
+
+    color: #374151;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+
+.boton-cancelar:hover {
+    background-color: #d1d5db;
+}
+
+
+/* =========================
    SIN PRÉSTAMOS
 ========================= */
 
@@ -314,6 +538,44 @@ body {
     text-align: center;
 
     color: #64748b;
+}
+
+
+/* =========================
+   BOTÓN VOLVER
+========================= */
+
+.boton-volver {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    margin-bottom: 18px;
+
+    padding: 9px 14px;
+
+    border-radius: 8px;
+
+    background-color: white;
+
+    border: 1px solid #cbd5e1;
+
+    color: #1f2937;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    transition: background-color 0.2s ease;
+}
+
+.boton-volver:hover {
+    background-color: #f8fafc;
 }
 
 
@@ -401,6 +663,20 @@ body {
     }
 
 
+    .filtros-prestamos {
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .filtro-prestamo {
+        width: 100%;
+
+        min-width: 0;
+    }
+
+
     .lista-prestamos {
         grid-template-columns: 1fr;
 
@@ -413,45 +689,27 @@ body {
     }
 
 
+    .informacion h2 {
+        font-size: 20px;
+    }
+
+
     .informacion h3 {
         font-size: 19px;
     }
 
-}
 
-/* =========================
-   BOTÓN VOLVER
-========================= */
+    .acciones-prestamo {
+        flex-direction: column;
+    }
 
-.boton-volver {
-    display: inline-flex;
 
-    align-items: center;
-    justify-content: center;
+    .boton-detalle,
+    .boton-eliminar,
+    .boton-cancelar {
+        width: 100%;
 
-    min-height: 42px;
+        min-width: 0;
+    }
 
-    margin-bottom: 18px;
-
-    padding: 9px 14px;
-
-    border-radius: 8px;
-
-    background-color: white;
-
-    border: 1px solid #cbd5e1;
-
-    color: #1f2937;
-
-    text-decoration: none;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    transition: background-color 0.2s ease;
-}
-
-.boton-volver:hover {
-    background-color: #f8fafc;
 }

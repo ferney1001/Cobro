@@ -3,6 +3,7 @@ from django.db import transaction
 from django.db.models import Q, Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 
 from clientes.models import Cliente
 from .forms import PrestamoForm, PrestamoEditarForm, PagoForm
@@ -34,40 +35,43 @@ def crear_prestamo(request):
         }
     )
 
-
 @login_required
 def lista_prestamos(request):
 
-    texto = request.GET.get('q', '').strip()
+    texto = request.GET.get(
+        'q',
+        ''
+    ).strip()
 
-    prestamos = Prestamo.objects.select_related(
-        'cliente'
-    ).prefetch_related(
-        'cuotas__pagos'
+    estado = request.GET.get(
+        'estado',
+        'por_pagar'
     )
 
+    if estado not in ['por_pagar', 'pagados']:
+        estado = 'por_pagar'
+
+    prestamos = (
+        Prestamo.objects
+        .select_related('cliente')
+        .prefetch_related('cuotas__pagos')
+    )
+
+    # Buscar cliente dentro de la sección seleccionada
     if texto:
-
         palabras = texto.split()
-
         consulta = Q()
 
         for palabra in palabras:
-
             consulta &= (
-                Q(
-                    cliente__nombre__icontains=palabra
-                ) |
-                Q(
-                    cliente__apellido__icontains=palabra
-                )
+                Q(cliente__nombre__icontains=palabra)
+                |
+                Q(cliente__apellido__icontains=palabra)
             )
 
         prestamos = prestamos.filter(consulta)
 
-
-    prestamos_activos = []
-
+    prestamos_resultado = []
 
     for prestamo in prestamos:
 
@@ -79,46 +83,110 @@ def lista_prestamos(request):
             total_prestamo += cuota.valor
 
             for pago in cuota.pagos.all():
-
                 total_pagado += pago.monto
-
 
         pendiente = total_prestamo - total_pagado
 
+        if pendiente <= 0:
+            estado_calculado = 'pagado'
 
-        if pendiente > 0:
+        elif total_pagado > 0:
+            estado_calculado = 'abono'
 
-            if total_pagado > 0:
+        else:
+            estado_calculado = 'pendiente'
 
-                estado = 'abono'
+        # PRÉSTAMOS PAGADOS
+        if estado == 'pagados':
 
-            else:
+            if estado_calculado != 'pagado':
+                continue
 
-                estado = 'pendiente'
+        # PRÉSTAMOS POR PAGAR
+        else:
 
+            if estado_calculado == 'pagado':
+                continue
 
-            prestamo.total_prestamo = total_prestamo
-            prestamo.total_pagado = total_pagado
-            prestamo.pendiente = pendiente
-            prestamo.estado_calculado = estado
+        prestamo.total_prestamo = total_prestamo
+        prestamo.total_pagado = total_pagado
+        prestamo.pendiente = max(
+            pendiente,
+            0
+        )
+        prestamo.estado_calculado = estado_calculado
 
-            prestamos_activos.append(prestamo)
+        prestamos_resultado.append(
+            prestamo
+        )
 
-
+    # Sin búsqueda: máximo 10
     if not texto:
-
-        prestamos_activos = prestamos_activos[:10]
-
+        prestamos_resultado = prestamos_resultado[:10]
 
     return render(
         request,
         'prestamos/lista_prestamos.html',
         {
-            'prestamos': prestamos_activos,
-            'busqueda': texto
+            'prestamos': prestamos_resultado,
+            'busqueda': texto,
+            'estado': estado,
         }
     )
 
+@login_required
+def eliminar_prestamo(request, prestamo_id):
+
+    prestamo = get_object_or_404(
+        Prestamo.objects.select_related('cliente'),
+        id=prestamo_id
+    )
+
+    cuotas = (
+        Cuota.objects
+        .filter(prestamo=prestamo)
+        .prefetch_related('pagos')
+    )
+
+    total_cuotas = 0
+    total_pagado = 0
+
+    for cuota in cuotas:
+
+        total_cuotas += cuota.valor
+
+        for pago in cuota.pagos.all():
+            total_pagado += pago.monto
+
+    pendiente = total_cuotas - total_pagado
+
+    # Solo se pueden eliminar préstamos
+    # completamente pagados.
+    if pendiente > 0:
+
+        return redirect(
+            'lista_prestamos'
+        )
+
+    # Mostrar confirmación
+    if request.method == 'GET':
+
+        return render(
+            request,
+            'prestamos/eliminar_prestamo.html',
+            {
+                'prestamo': prestamo,
+            }
+        )
+
+    # Eliminar solamente mediante POST
+    if request.method == 'POST':
+
+        prestamo.delete()
+
+        return redirect(
+            f"{reverse('lista_prestamos')}?estado=pagados"
+        )
 
 @login_required
 def detalle_prestamo(request, prestamo_id):

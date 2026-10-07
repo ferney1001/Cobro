@@ -1,0 +1,123 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Eliminar préstamo - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/lista_prestamos.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="encabezado">
+
+        <h1>
+            Eliminar préstamo
+        </h1>
+
+    </header>
+
+
+    <main class="contenedor">
+
+
+        <section class="tarjeta-prestamo">
+
+
+            <div class="informacion">
+
+
+                <h2>
+                    ⚠️ ¿Eliminar préstamo
+                    #{{ prestamo.numero_prestamo }}?
+                </h2>
+
+
+                <p>
+
+                    Cliente:
+
+                    <strong>
+                        {{ prestamo.cliente.nombre }}
+                        {{ prestamo.cliente.apellido }}
+                    </strong>
+
+                </p>
+
+
+                <p>
+
+                    Se eliminarán también sus cuotas
+                    y registros de pago.
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Esta acción no se puede deshacer.
+                    </strong>
+
+                </p>
+
+
+            </div>
+
+
+            <div class="acciones-prestamo">
+
+
+                <a
+                    href="{% url 'lista_prestamos' %}?estado=pagados"
+                    class="boton-detalle"
+                >
+                    Cancelar
+                </a>
+
+
+                <form
+                    method="post"
+                    style="display: inline;"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="boton-eliminar"
+                    >
+                        Eliminar
+                    </button>
+
+                </form>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>
