@@ -199,6 +199,33 @@
 
 
                 <!-- =========================
+                     MEDIO DE PAGO
+                ========================== -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.medio_pago.id_for_label }}"
+                    >
+                        Medio de pago
+                    </label>
+
+
+                    {{ formulario.medio_pago }}
+
+
+                    {% if formulario.medio_pago.errors %}
+
+                        <div class="error">
+                            {{ formulario.medio_pago.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
                      FECHA Y HORA
                 ========================== -->
 

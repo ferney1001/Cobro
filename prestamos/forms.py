@@ -155,7 +155,8 @@ class PagoForm(forms.ModelForm):
 
         fields = [
             'monto',
-            'fecha_hora'
+            'fecha_hora',
+            'medio_pago'
         ]
 
         widgets = {
@@ -169,6 +170,7 @@ class PagoForm(forms.ModelForm):
                 format='%Y-%m-%dT%H:%M',
                 attrs={'type': 'datetime-local'}
             ),
+            'medio_pago': forms.Select(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -178,6 +180,12 @@ class PagoForm(forms.ModelForm):
             self.initial['fecha_hora'] = timezone.localtime().strftime(
                 '%Y-%m-%dT%H:%M'
             )
+
+        self.fields['medio_pago'].choices = [
+            ('', 'Seleccione el medio de pago'),
+            ('efectivo', '💵 Efectivo'),
+            ('nequi', '📱 Nequi'),
+        ]
 
     def clean_monto(self):
 

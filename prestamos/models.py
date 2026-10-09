@@ -435,6 +435,11 @@ class Cuota(models.Model):
 
 class Pago(models.Model):
 
+    MEDIO_PAGO_CHOICES = [
+        ('efectivo', 'Efectivo'),
+        ('nequi', 'Nequi'),
+    ]
+
     cuota = models.ForeignKey(
         Cuota,
         on_delete=models.CASCADE,
@@ -447,6 +452,13 @@ class Pago(models.Model):
     )
 
     fecha_hora = models.DateTimeField()
+
+    medio_pago = models.CharField(
+        max_length=10,
+        choices=MEDIO_PAGO_CHOICES,
+        null=True,
+        blank=True
+    )
 
 
     def __str__(self):

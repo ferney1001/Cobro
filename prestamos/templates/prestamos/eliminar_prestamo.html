@@ -84,13 +84,13 @@
             <div class="acciones-prestamo">
 
 
+
                 <a
-                    href="{% url 'lista_prestamos' %}?estado=pagados"
+                    href="{% if origen == 'contabilidad_cliente' %}{% url 'contabilidad_cliente' %}?prestamo={{ prestamo.id }}{% else %}{% url 'lista_prestamos' %}?estado=pagados{% endif %}"
                     class="boton-detalle"
                 >
                     Cancelar
                 </a>
-
 
                 <form
                     method="post"
@@ -98,7 +98,11 @@
                 >
 
                     {% csrf_token %}
-
+                    <input
+                        type="hidden"
+                        name="origen"
+                        value="{{ origen }}"
+                    >
                     <button
                         type="submit"
                         class="boton-eliminar"

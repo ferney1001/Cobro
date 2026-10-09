@@ -1,0 +1,102 @@
+
+{% load static %}
+{% load formato_dinero %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago registrado - Cobro</title>
+    <link rel="stylesheet" href="{% static 'prestamos/css/registrar_pago.css' %}">
+    <style>
+        .resultado {
+            max-width: 600px;
+            margin: 24px auto;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .resultado li {
+            margin: 12px 0;
+        }
+
+        .total {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f0fdf4;
+            border-radius: 8px;
+        }
+
+        .cambio {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fff7ed;
+            border-radius: 8px;
+        }
+
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="encabezado">
+        <div class="encabezado-contenido">
+            <h1>Pago registrado</h1>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <section class="resultado">
+
+            <h2>
+                {{ prestamo.cliente.nombre }}
+                {{ prestamo.cliente.apellido }}
+            </h2>
+
+            <p>
+                Préstamo #{{ prestamo.numero_prestamo }}
+            </p>
+
+            <p>
+                Dinero recibido:
+                <strong>${{ monto_recibido|dinero }}</strong>
+            </p>
+
+            <h3>Distribución del pago</h3>
+
+            <ul>
+                {% for detalle in detalles_pagos %}
+                    <li>
+                        Cuota {{ detalle.cuota.numero }}
+                        — fecha original:
+                        {{ detalle.cuota.fecha_cobro|date:"d/m/Y" }}
+                        — aplicado:
+                        <strong>${{ detalle.monto|dinero }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="total">
+                Total aplicado:
+                <strong>${{ total_aplicado|dinero }}</strong>
+            </div>
+
+            <div class="cambio">
+                Cambio que se debe devolver:
+                <strong>${{ cambio|dinero }}</strong>
+            </div>
+
+            <a href="{% url 'dashboard' %}" class="volver">
+                ← Volver al inicio
+            </a>
+
+        </section>
+    </main>
+
+</body>
+</html>

@@ -22,13 +22,13 @@
 
 </head>
 
-
 <body>
-
 
     <header class="encabezado">
 
-        <h1>Detalle del préstamo</h1>
+        <h1>
+            Detalle del préstamo
+        </h1>
 
     </header>
 
@@ -44,18 +44,18 @@
         </a>
 
 
-        <!-- Información del préstamo -->
+        <!-- RESUMEN DEL PRÉSTAMO -->
 
         <section class="tarjeta-resumen">
-
 
             <h2>
                 {{ prestamo.cliente }}
             </h2>
 
-
             <p class="subtitulo">
+
                 Préstamo #{{ prestamo.numero_prestamo }}
+
             </p>
 
 
@@ -64,7 +64,9 @@
 
                 <div class="dato destacado">
 
-                    <strong>Monto prestado</strong>
+                    <strong>
+                        Monto prestado
+                    </strong>
 
                     <span>
                         ${{ prestamo.monto|dinero }}
@@ -75,7 +77,9 @@
 
                 <div class="dato">
 
-                    <strong>Interés</strong>
+                    <strong>
+                        Interés
+                    </strong>
 
                     <span>
                         {{ prestamo.porcentaje_interes }}%
@@ -86,7 +90,9 @@
 
                 <div class="dato">
 
-                    <strong>Frecuencia</strong>
+                    <strong>
+                        Frecuencia
+                    </strong>
 
                     <span>
                         {{ prestamo.get_frecuencia_display }}
@@ -97,7 +103,9 @@
 
                 <div class="dato">
 
-                    <strong>Número de cuotas</strong>
+                    <strong>
+                        Número de cuotas
+                    </strong>
 
                     <span>
                         {{ prestamo.numero_cuotas }}
@@ -108,7 +116,9 @@
 
                 <div class="dato">
 
-                    <strong>Fecha del préstamo</strong>
+                    <strong>
+                        Fecha del préstamo
+                    </strong>
 
                     <span>
                         {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
@@ -119,7 +129,9 @@
 
                 <div class="dato">
 
-                    <strong>Primer cobro</strong>
+                    <strong>
+                        Primer cobro
+                    </strong>
 
                     <span>
                         {{ prestamo.fecha_primer_cobro|date:"d/m/Y" }}
@@ -130,7 +142,9 @@
 
                 <div class="dato">
 
-                    <strong>Interés generado</strong>
+                    <strong>
+                        Interés generado
+                    </strong>
 
                     <span>
                         ${{ interes|dinero }}
@@ -141,35 +155,38 @@
 
                 <div class="dato destacado">
 
-                    <strong>Total a pagar</strong>
+                    <strong>
+                        Total a pagar
+                    </strong>
 
                     <span>
                         ${{ total|dinero }}
                     </span>
 
                 </div>
+
+
                 {% if prestamo.activo %}
 
-                <a
-                    href="{% url 'editar_prestamo' prestamo.id %}"
-                    class="boton-editar"
-                >
-                    ✏️ Editar préstamo
-                </a>
+                    <a
+                        href="{% url 'editar_prestamo' prestamo.id %}"
+                        class="boton-editar"
+                    >
+                        ✏️ Editar préstamo
+                    </a>
 
                 {% endif %}
 
 
             </div>
 
-
         </section>
 
 
-        <!-- Cuotas -->
+
+        <!-- CUOTAS -->
 
         <section class="seccion-cuotas">
-
 
             <h2>
                 Cuotas
@@ -182,11 +199,17 @@
                 <article class="cuota">
 
 
+                    <!-- CABECERA DE LA CUOTA -->
+
                     <div class="cabecera-cuota">
 
-
                         <h3>
-                            Cuota {{ cuota.numero }} de {{ prestamo.numero_cuotas }}
+
+                            Cuota
+                            {{ cuota.numero }}
+                            de
+                            {{ prestamo.numero_cuotas }}
+
                         </h3>
 
 
@@ -210,26 +233,33 @@
 
                         {% endif %}
 
-
                     </div>
 
 
+
+                    <!-- INFORMACIÓN DE LA CUOTA -->
+
                     <div class="info-cuota">
 
-
                         <span>
+
                             Fecha de cobro:
                             {{ cuota.fecha_cobro|date:"d/m/Y" }}
+
                         </span>
 
 
                         <span class="valor-cuota">
-                            ${{ cuota.valor|dinero }}
-                        </span>
 
+                            ${{ cuota.valor|dinero }}
+
+                        </span>
 
                     </div>
 
+
+
+                    <!-- RESUMEN DE PAGOS -->
 
                     <div class="resumen-pago">
 
@@ -263,9 +293,13 @@
                     </div>
 
 
+
+                    <!-- HISTORIAL DE PAGOS -->
+
                     {% if cuota.pagos.all %}
 
                         <div class="historial-pagos">
+
 
                             <h4>
                                 Pagos realizados
@@ -275,66 +309,120 @@
                             <div class="tabla-pagos">
 
 
-                                <!-- Encabezado -->
+                                <!-- ENCABEZADO -->
 
                                 <div class="fila-pago encabezado-pago">
+
 
                                     <span>
                                         Fecha
                                     </span>
 
+
                                     <span>
                                         Hora
                                     </span>
+
+
+                                    <span>
+                                        Tipo de pago
+                                    </span>
+
 
                                     <span>
                                         Abono
                                     </span>
 
+
                                 </div>
 
 
-                                <!-- Pagos -->
+
+                                <!-- PAGOS -->
 
                                 {% for pago in cuota.pagos.all %}
 
+
                                     <div class="fila-pago">
 
-                                        <span>
-                                            {{ pago.fecha_hora|date:"d/m/Y" }}
-                                        </span>
 
                                         <span>
-                                            {{ pago.fecha_hora|date:"H:i" }}
+
+                                            {{ pago.fecha_hora|date:"d/m/Y" }}
+
                                         </span>
+
+
+                                        <span>
+
+                                            {{ pago.fecha_hora|date:"H:i" }}
+
+                                        </span>
+
+
+                                        <span>
+
+
+                                            {% if pago.medio_pago == 'efectivo' %}
+
+                                                💵 Efectivo
+
+                                            {% elif pago.medio_pago == 'nequi' %}
+
+                                                📱 Nequi
+
+                                            {% else %}
+
+                                                Sin registrar
+
+                                            {% endif %}
+
+
+                                        </span>
+
 
                                         <strong>
+
                                             ${{ pago.monto|dinero }}
+
                                         </strong>
 
+
                                     </div>
+
 
                                 {% endfor %}
 
 
-                                <!-- Total -->
+
+                                <!-- TOTAL ABONADO -->
 
                                 <div class="fila-pago total-pago">
+
 
                                     <strong>
                                         Total abonado
                                     </strong>
 
+
                                     <span></span>
 
+
+                                    <span></span>
+
+
                                     <strong>
+
                                         ${{ cuota.abonado|dinero }}
+
                                     </strong>
+
 
                                 </div>
 
 
                             </div>
+
 
                         </div>
 
@@ -346,11 +434,9 @@
 
             {% empty %}
 
-
                 <p>
                     Este préstamo todavía no tiene cuotas.
                 </p>
-
 
             {% endfor %}
 
@@ -359,7 +445,6 @@
 
 
     </main>
-
 
 </body>
 

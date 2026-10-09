@@ -73,6 +73,7 @@
             <input
                 type="text"
                 name="q"
+                id="buscador-prestamos"
                 value="{{ busqueda }}"
                 placeholder="🔎 Buscar cliente..."
                 autocomplete="off"
@@ -99,7 +100,8 @@
 
 
             <a
-                href="?estado=por_pagar{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}"
+                href="?estado=por_pagar"
+                data-estado="por_pagar"
                 class="
                     filtro-prestamo
                     {% if estado == 'por_pagar' %}
@@ -112,7 +114,8 @@
 
 
             <a
-                href="?estado=pagados{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}"
+                href="?estado=pagados"
+                data-estado="pagados"
                 class="
                     filtro-prestamo
                     {% if estado == 'pagados' %}
@@ -142,8 +145,10 @@
 
 
                         <h3>
+
                             {{ prestamo.cliente.nombre }}
                             {{ prestamo.cliente.apellido }}
+
                         </h3>
 
 
@@ -202,26 +207,38 @@
 
 
                         <p>
+
                             Fecha del préstamo:
+
                             {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
+
                         </p>
+
 
                         {% if prestamo.estado_calculado == 'pagado' %}
 
                             <p class="estado-prestamo estado-pagado">
+
                                 ✓ PRÉSTAMO PAGADO
+
                             </p>
+
 
                         {% elif prestamo.estado_calculado == 'abono' %}
 
                             <p class="estado-prestamo estado-abono">
+
                                 ABONO
+
                             </p>
+
 
                         {% else %}
 
                             <p class="estado-prestamo estado-pendiente">
+
                                 PENDIENTE
+
                             </p>
 
                         {% endif %}
@@ -264,6 +281,7 @@
 
                 <p class="sin-prestamos">
 
+
                     {% if estado == 'pagados' %}
 
                         No hay préstamos pagados.
@@ -273,6 +291,7 @@
                         No hay préstamos por pagar.
 
                     {% endif %}
+
 
                 </p>
 
@@ -284,6 +303,13 @@
 
 
     </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script
+        src="{% static 'prestamos/js/lista_prestamos.js' %}"
+    ></script>
 
 
 </body>

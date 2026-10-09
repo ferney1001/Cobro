@@ -5,204 +5,224 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #eef2f7;
-    color: #1f2937;
+    background-color: #f3f4f6;
+    color: #111827;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 
-/* Encabezado */
+/* ENCABEZADO */
 
 .encabezado {
     background-color: #2563eb;
     color: white;
-    padding: 20px 16px;
+    padding: 18px 16px;
     text-align: center;
 }
 
+
 .encabezado h1 {
     margin: 0;
-    font-size: 26px;
+    font-size: 22px;
 }
 
 
-/* Contenedor */
+/* CONTENEDOR */
 
 .contenedor {
     width: 100%;
-    max-width: 700px;
-    margin: 25px auto;
-    padding: 0 16px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px;
 }
 
 
-/* Botón volver */
+/* BOTÓN VOLVER */
 
 .boton-volver {
     display: inline-flex;
     align-items: center;
-    min-height: 42px;
-    margin-bottom: 18px;
-    padding: 9px 14px;
+    justify-content: center;
+
+    margin-bottom: 16px;
+    padding: 10px 14px;
+
+    background-color: #ffffff;
+    color: #2563eb;
+
+    border: 1px solid #2563eb;
     border-radius: 8px;
-    background-color: white;
-    border: 1px solid #cbd5e1;
-    color: #1f2937;
+
     text-decoration: none;
-    font-size: 15px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 }
+
 
 .boton-volver:hover {
-    background-color: #f8fafc;
+    background-color: #2563eb;
+    color: #ffffff;
 }
 
 
-/* Botón editar */
+
+/* RESUMEN DEL PRÉSTAMO */
+
+.tarjeta-resumen {
+    background-color: white;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 22px;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+
+.tarjeta-resumen h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+
+.subtitulo {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    color: #6b7280;
+}
+
+
+.datos-prestamo {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+
+.dato {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px;
+
+    background-color: #f9fafb;
+    border-radius: 8px;
+}
+
+
+.dato strong {
+    color: #374151;
+}
+
+
+.dato span {
+    text-align: right;
+    font-weight: 600;
+}
+
+
+.dato.destacado {
+    background-color: #eff6ff;
+}
+
+
+.dato.destacado span {
+    color: #1d4ed8;
+    font-size: 17px;
+}
+
+
+/* BOTÓN EDITAR */
 
 .boton-editar {
     display: block;
-    width: fit-content;
-    margin: 14px auto 0;
-    padding: 12px 24px;
-    border-radius: 8px;
+    width: 100%;
+
+    padding: 12px;
+    margin-top: 5px;
+
     background-color: #2563eb;
     color: white;
-    text-decoration: none;
+
     text-align: center;
-    font-size: 15px;
-    font-weight: bold;
+    text-decoration: none;
+
+    border-radius: 8px;
+    font-weight: 600;
 }
+
 
 .boton-editar:hover {
     background-color: #1d4ed8;
 }
 
 
-/* Información principal */
 
-.tarjeta-resumen {
-    background-color: white;
-    padding: 22px;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-    margin-bottom: 20px;
-}
-
-.tarjeta-resumen h2 {
-    margin: 0 0 6px;
-    font-size: 23px;
-    color: #111827;
-}
-
-.subtitulo {
-    margin: 0 0 22px;
-    color: #64748b;
-    font-size: 15px;
-}
-
-
-/* Datos del préstamo */
-
-.datos-prestamo {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.dato {
-    padding: 12px;
-    border-radius: 8px;
-    background-color: #f8fafc;
-}
-
-.dato.destacado {
-    grid-column: 1 / -1;
-    background-color: #eff6ff;
-}
-
-.dato strong {
-    display: block;
-    margin-bottom: 5px;
-    color: #64748b;
-    font-size: 12px;
-}
-
-.dato span {
-    font-size: 16px;
-    color: #1f2937;
-}
-
-
-/* Sección de cuotas */
-
-.seccion-cuotas {
-    background-color: white;
-    padding: 22px;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-}
+/* SECCIÓN DE CUOTAS */
 
 .seccion-cuotas h2 {
-    margin: 0 0 18px;
-    font-size: 21px;
-    color: #111827;
+    margin-bottom: 14px;
 }
 
-
-/* Cuota */
 
 .cuota {
-    padding: 16px 0;
-    border-bottom: 1px solid #e5e7eb;
+    background-color: white;
+    border-radius: 12px;
+
+    padding: 16px;
+    margin-bottom: 16px;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.cuota:first-child {
-    padding-top: 0;
-}
-
-.cuota:last-child {
-    padding-bottom: 0;
-    border-bottom: none;
-}
 
 .cabecera-cuota {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     gap: 10px;
-    margin-bottom: 8px;
 }
+
 
 .cabecera-cuota h3 {
     margin: 0;
     font-size: 17px;
-    color: #1f2937;
 }
 
-
-/* Estados */
 
 .estado {
+    display: inline-block;
+
     padding: 5px 9px;
-    border-radius: 20px;
-    background-color: #fef3c7;
-    color: #92400e;
+
+    border-radius: 999px;
+
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 700;
+
+    white-space: nowrap;
 }
+
 
 .estado-pagada {
     background-color: #dcfce7;
     color: #166534;
 }
 
+
 .estado-abono {
     background-color: #fef3c7;
     color: #92400e;
 }
+
 
 .estado-pendiente {
     background-color: #fee2e2;
@@ -210,63 +230,110 @@ body {
 }
 
 
-/* Información de la cuota */
+
+/* INFORMACIÓN DE LA CUOTA */
 
 .info-cuota {
     display: flex;
     justify-content: space-between;
-    gap: 15px;
-    color: #64748b;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 14px;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #e5e7eb;
+
     font-size: 14px;
 }
 
+
 .valor-cuota {
-    color: #1e3a8a;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 
-/* Historial de pagos */
+
+/* RESUMEN DE PAGOS */
+
+.resumen-pago {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-top: 12px;
+}
+
+
+.resumen-pago > div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 10px;
+
+    background-color: #f9fafb;
+
+    border-radius: 8px;
+}
+
+
+.resumen-pago strong {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+
+.resumen-pago span {
+    font-weight: 700;
+}
+
+
+
+/* HISTORIAL DE PAGOS */
 
 .historial-pagos {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
+    margin-top: 18px;
 }
+
 
 .historial-pagos h4 {
-    margin: 0 0 12px;
+    margin: 0 0 10px 0;
+
     font-size: 15px;
-    color: #1f2937;
 }
 
-
-/* Tabla de pagos */
 
 .tabla-pagos {
     width: 100%;
-    border: 1px solid #e2e8f0;
+
+    overflow-x: auto;
+
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
-    overflow: hidden;
-    background-color: #f8fafc;
+
+    background-color: white;
 }
 
-
-/* Filas */
 
 .fila-pago {
     display: grid;
 
-    /*
-        Las tres columnas tienen ahora
-        exactamente el mismo ancho.
-    */
-
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns:
+        1.15fr
+        0.75fr
+        1.25fr
+        1fr;
 
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
+
+    min-width: 360px;
 
     padding: 10px 12px;
 
@@ -276,114 +343,109 @@ body {
 }
 
 
-/* Encabezado */
+.fila-pago:last-child {
+    border-bottom: none;
+}
+
 
 .encabezado-pago {
-    background-color: #f1f5f9;
-    color: #64748b;
+    background-color: #f9fafb;
+
+    color: #374151;
+
     font-size: 12px;
-    font-weight: bold;
+
+    font-weight: 700;
 }
 
 
-/* Alineación */
-
-.fila-pago span,
-.fila-pago strong {
-    text-align: left;
-}
-
-
-/*
-    La columna Abono y sus valores
-    quedan alineados entre sí.
-*/
-
-.fila-pago > :nth-child(3) {
+.fila-pago > :nth-child(4) {
     text-align: right;
 }
 
 
-/* Total */
+
+/* TOTAL ABONADO */
 
 .total-pago {
-    background-color: white;
+    background-color: #f9fafb;
+
     border-bottom: none;
-    font-size: 14px;
 }
 
+
 .total-pago strong:first-child {
-    grid-column: 1 / 3;
+    grid-column: 1 / 4;
 }
+
 
 .total-pago strong:last-child {
     color: #166534;
+
     font-size: 15px;
+
+    text-align: right;
 }
 
 
-/* Móvil */
 
-@media (max-width: 480px) {
+/* TABLET / PC */
 
-    .encabezado {
-        padding: 17px 14px;
-    }
-
-    .encabezado h1 {
-        font-size: 22px;
-    }
+@media (min-width: 600px) {
 
     .contenedor {
-        margin: 20px auto;
-        padding: 0 12px;
+        padding: 24px;
     }
 
-    .tarjeta-resumen,
-    .seccion-cuotas {
-        padding: 17px;
-    }
 
     .datos-prestamo {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
 
-    .dato.destacado {
-        grid-column: auto;
-    }
-
-    .cabecera-cuota {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .info-cuota {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-
-    /* Tabla de pagos en móvil */
-
-    .fila-pago {
-        grid-template-columns: 1fr 1fr 1fr;
-        padding: 10px 8px;
-        font-size: 13px;
-        gap: 6px;
-    }
-
-    .encabezado-pago {
-        font-size: 11px;
-    }
-
-
-    /* Botón editar en móvil */
 
     .boton-editar {
-        width: fit-content;
-        margin: 12px auto 0;
-        padding: 12px 22px;
-        font-size: 14px;
+        grid-column: 1 / -1;
+    }
+
+}
+
+
+
+/* MÓVIL */
+
+@media (max-width: 599px) {
+
+    .fila-pago {
+        grid-template-columns:
+            1.1fr
+            0.7fr
+            1.25fr
+            1fr;
+
+        gap: 5px;
+
+        padding: 10px 7px;
+
+        font-size: 12px;
+    }
+
+
+    .encabezado-pago {
+        font-size: 10px;
+    }
+
+
+    .fila-pago > :nth-child(3) {
+        text-align: left;
+
+        white-space: nowrap;
+    }
+
+
+    .fila-pago > :nth-child(4) {
+        text-align: right;
+
+        white-space: nowrap;
     }
 
 }

@@ -1,0 +1,979 @@
+{% load static %}
+{% load formato_dinero %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Contabilidad por cliente</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/contabilidad.css' %}"
+    >
+
+    <style>
+
+        .busqueda-cliente {
+            margin-top: 20px;
+        }
+
+        .busqueda-cliente form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .busqueda-cliente input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .busqueda-cliente button,
+        .boton-seleccionar {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .busqueda-cliente button:hover,
+        .boton-seleccionar:hover {
+            background: #1d4ed8;
+        }
+
+        .resultados-clientes {
+            margin-top: 15px;
+        }
+
+        .cliente-resultado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .cliente-nombre {
+            font-weight: 600;
+        }
+
+        .prestamos-cliente {
+            margin-top: 20px;
+        }
+
+        .prestamo-resultado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .prestamo-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .prestamo-info span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .resumen {
+            margin-top: 20px;
+        }
+
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .resumen-item {
+            padding: 15px;
+            border-radius: 8px;
+            background: #f5f7fa;
+        }
+
+        .resumen-item span {
+            display: block;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .resumen-item strong {
+            font-size: 18px;
+        }
+
+        .estado-prestamo {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .estado-prestamo.pagado {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .estado-prestamo.abono {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .estado-prestamo.pendiente {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .filtro-periodo {
+            margin-top: 20px;
+        }
+
+        .fila-periodo {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .campo-periodo label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .campo-periodo input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .campo-periodo input:disabled {
+            background: #f1f1f1;
+        }
+
+        .boton-consultar {
+            padding: 11px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .boton-consultar:hover {
+            background: #1d4ed8;
+        }
+
+        .cliente-titulo {
+            margin-top: 20px;
+        }
+
+        .cliente-titulo p {
+            margin: 5px 0;
+        }
+
+        .prestamo-seleccionado {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+
+        .totales-periodo {
+            margin-top: 20px;
+        }
+
+        .totales-periodo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 700px) {
+
+            .cliente-resultado,
+            .prestamo-resultado {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .boton-seleccionar {
+                text-align: center;
+            }
+
+            .resumen-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fila-periodo {
+                grid-template-columns: 1fr;
+            }
+
+            .totales-periodo-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <main class="contenedor">
+
+
+        <!-- ENCABEZADO -->
+
+        <header class="encabezado">
+
+            <div>
+
+                <h1>
+                    Contabilidad
+                </h1>
+
+                <p>
+                    Contabilidad por cliente
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="boton-volver"
+            >
+                ← Volver
+            </a>
+
+        </header>
+
+
+        <!-- PESTAÑAS -->
+
+        <nav class="pestanas">
+
+            <a
+                href="{% url 'contabilidad' %}"
+                class="pestana"
+            >
+                Contabilidad diaria
+            </a>
+
+
+            <a
+                href="{% url 'contabilidad_cliente' %}"
+                class="pestana activa"
+            >
+                Por cliente
+            </a>
+
+        </nav>
+
+
+        <!-- BUSCAR CLIENTE -->
+
+        <section class="seccion">
+
+            <div class="titulo-seccion">
+
+                <h2>
+                    Buscar cliente
+                </h2>
+
+            </div>
+
+
+            <div class="busqueda-cliente">
+
+                <form method="get">
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ busqueda }}"
+                        placeholder="🔎 Nombre o apellido..."
+                    >
+
+                    <button type="submit">
+                        Buscar
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            {% if busqueda %}
+
+                <div class="resultados-clientes">
+
+                    {% if clientes %}
+
+                        {% for cliente in clientes %}
+
+                            <div class="cliente-resultado">
+
+                                <div>
+
+                                    <div class="cliente-nombre">
+                                        {{ cliente.nombre }}
+                                        {{ cliente.apellido }}
+                                    </div>
+
+                                    <small>
+                                        Teléfono: {{ cliente.telefono }}
+                                    </small>
+
+                                </div>
+
+
+                                <a
+                                    href="?cliente={{ cliente.id }}"
+                                    class="boton-seleccionar"
+                                >
+                                    Seleccionar
+                                </a>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p>
+                            No se encontraron clientes.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- CLIENTE SELECCIONADO -->
+
+        {% if cliente_seleccionado %}
+
+            <section class="seccion cliente-titulo">
+
+                <div class="titulo-seccion">
+
+                    <h2>
+                        Cliente seleccionado
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    <strong>
+                        {{ cliente_seleccionado.nombre }}
+                        {{ cliente_seleccionado.apellido }}
+                    </strong>
+                </p>
+
+
+                <p>
+                    Teléfono:
+                    {{ cliente_seleccionado.telefono }}
+                </p>
+
+            </section>
+
+
+            <!-- PRÉSTAMOS DEL CLIENTE -->
+
+            <section class="seccion prestamos-cliente">
+
+                <div class="titulo-seccion">
+
+                    <h2>
+                        Préstamos
+                    </h2>
+
+                    <span class="contador">
+                        {{ prestamos_cliente|length }}
+                    </span>
+
+                </div>
+
+
+                {% for prestamo in prestamos_cliente %}
+
+                    <div class="prestamo-resultado">
+
+                        <div class="prestamo-info">
+
+                            <strong>
+                                Préstamo #{{ prestamo.numero_prestamo }}
+                            </strong>
+
+                            <span>
+                                Fecha:
+                                {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
+                            </span>
+
+                            <br>
+
+                            <span>
+                                Monto:
+                                ${{ prestamo.monto|dinero }}
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="?prestamo={{ prestamo.id }}"
+                            class="boton-seleccionar"
+                        >
+                            Ver préstamo
+                        </a>
+
+                    </div>
+
+                {% empty %}
+
+                    <p>
+                        Este cliente no tiene préstamos.
+                    </p>
+
+                {% endfor %}
+
+            </section>
+
+        {% endif %}
+
+
+        {% if prestamo_seleccionado %}
+
+
+            <!-- PRÉSTAMO SELECCIONADO -->
+
+            <section class="seccion">
+
+                <div class="titulo-seccion">
+
+                    <h2>
+                        Préstamo #{{ prestamo_seleccionado.numero_prestamo }}
+                    </h2>
+
+                </div>
+
+
+                <div class="prestamo-seleccionado">
+
+                    <p>
+                        Cliente:
+                        <strong>
+                            {{ prestamo_seleccionado.cliente.nombre }}
+                            {{ prestamo_seleccionado.cliente.apellido }}
+                        </strong>
+                    </p>
+
+
+                    <p>
+                        Fecha del préstamo:
+                        {{ prestamo_seleccionado.fecha_prestamo|date:"d/m/Y" }}
+                    </p>
+
+
+                    <p>
+                        Tipo:
+
+                        {% if prestamo_seleccionado.tipo_prestamo == 'solo_intereses' %}
+                            Solo intereses
+                        {% else %}
+                            Capital + intereses
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+
+                <!-- RESUMEN -->
+
+                <div class="resumen">
+
+                    <h3>
+                        Resumen del préstamo
+                    </h3>
+
+
+                    <div class="resumen-grid">
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Total prestado
+                            </span>
+
+                            <strong>
+                                ${{ prestamo_seleccionado.monto|dinero }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Interés
+                            </span>
+
+                            <strong>
+                                ${{ prestamo_seleccionado.interes_calculado|dinero }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Total planeado recuperar
+                            </span>
+
+                            <strong>
+                                ${{ prestamo_seleccionado.total_planeado|dinero }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Recuperado
+                            </span>
+
+                            <strong>
+                                ${{ prestamo_seleccionado.total_recuperado|dinero }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Pendiente
+                            </span>
+
+                            <strong>
+                                ${{ prestamo_seleccionado.pendiente_calculado|dinero }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Número de cuotas
+                            </span>
+
+                            <strong>
+                                {{ prestamo_seleccionado.numero_cuotas }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Cuotas pagadas
+                            </span>
+
+                            <strong>
+                                {{ prestamo_seleccionado.cuotas_pagadas }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Cuotas con abono
+                            </span>
+
+                            <strong>
+                                {{ prestamo_seleccionado.cuotas_abono }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="resumen-item">
+
+                            <span>
+                                Cuotas pendientes
+                            </span>
+
+                            <strong>
+                                {{ prestamo_seleccionado.cuotas_pendientes }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ESTADO -->
+
+                    <div
+                        class="estado-prestamo {{ prestamo_seleccionado.estado_calculado }}"
+                    >
+                        {% if prestamo_seleccionado.estado_calculado == 'pagado' %}
+
+                            <div style="margin-top: 15px; text-align: right;">
+
+                                <a
+                                    href="{% url 'eliminar_prestamo' prestamo_seleccionado.id %}?origen=contabilidad_cliente"
+                                    class="boton-eliminar"
+                                    style="display: inline-block; padding: 12px 16px; border-radius: 8px; background: #dc2626; color: white; text-decoration: none; font-weight: 600;"
+                                >
+                                    Eliminar préstamo
+                                </a>
+
+                            </div>
+
+                        {% endif %}
+
+                        {% if prestamo_seleccionado.estado_calculado == 'pagado' %}
+
+                            PRÉSTAMO PAGADO
+
+                        {% elif prestamo_seleccionado.estado_calculado == 'abono' %}
+
+                            PRÉSTAMO CON ABONOS
+
+                        {% else %}
+
+                            PRÉSTAMO PENDIENTE
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PERÍODO -->
+
+            <section class="seccion filtro-periodo">
+
+                <div class="titulo-seccion">
+
+                    <h2>
+                        Período
+                    </h2>
+
+                </div>
+
+
+                <form method="get">
+
+                    <input
+                        type="hidden"
+                        name="prestamo"
+                        value="{{ prestamo_seleccionado.id }}"
+                    >
+
+
+                    <div class="fila-periodo">
+
+                        <div class="campo-periodo">
+
+                            <label for="desde">
+                                Desde
+                            </label>
+
+                            <input
+                                type="date"
+                                id="desde"
+                                value="{{ fecha_desde|date:'Y-m-d' }}"
+                                disabled
+                            >
+
+                        </div>
+
+
+                        <div class="campo-periodo">
+
+                            <label for="hasta">
+                                Hasta
+                            </label>
+
+                            <input
+                                type="date"
+                                id="hasta"
+                                name="hasta"
+                                value="{{ fecha_hasta|date:'Y-m-d' }}"
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="boton-consultar"
+                        >
+                            Consultar
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- MOVIMIENTOS -->
+
+            <section class="seccion">
+
+                <div class="titulo-seccion">
+
+                    <h2>
+                        Movimientos
+                    </h2>
+
+                    <span class="contador">
+                        {{ pagos|length }}
+                    </span>
+
+                </div>
+
+
+                {% if pagos %}
+
+                    <div class="tabla-contenedor">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Cuota
+                                    </th>
+
+                                    <th>
+                                        Fecha
+                                    </th>
+
+                                    <th>
+                                        Tipo de pago
+                                    </th>
+
+                                    <th>
+                                        Medio
+                                    </th>
+
+                                    <th>
+                                        Valor
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for pago in pagos %}
+
+                                    <tr>
+
+                                        <td>
+                                            #{{ pago.cuota.numero }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ pago.fecha_hora|date:"d/m/Y H:i" }}
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if pago.tipo_pago_calculado == 'completo' %}
+
+                                                <span class="estado completo">
+                                                    Pago completo
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="estado abono">
+                                                    Abono
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if pago.medio_pago == 'efectivo' %}
+
+                                                Efectivo
+
+                                            {% elif pago.medio_pago == 'nequi' %}
+
+                                                Nequi
+
+                                            {% else %}
+
+                                                -
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td class="valor">
+                                            ${{ pago.monto|dinero }}
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="sin-movimientos">
+
+                        <div class="icono-vacio">
+                            $
+                        </div>
+
+                        <h3>
+                            No hay movimientos
+                        </h3>
+
+                        <p>
+                            No se registraron pagos en este período.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- TOTALES DEL PERÍODO -->
+
+            <section class="totales-periodo">
+
+                <div class="totales-periodo-grid">
+
+                    <div class="tarjeta-total">
+
+                        <span class="etiqueta">
+                            Total efectivo
+                        </span>
+
+                        <strong>
+                            ${{ total_efectivo_periodo|dinero }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="tarjeta-total">
+
+                        <span class="etiqueta">
+                            Total Nequi
+                        </span>
+
+                        <strong>
+                            ${{ total_nequi_periodo|dinero }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="tarjeta-total total-recibido">
+
+                        <span class="etiqueta">
+                            Total recogido
+                        </span>
+
+                        <strong>
+                            ${{ total_recogido_periodo|dinero }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        {% endif %}
+
+
+    </main>
+
+</body>
+
+</html>

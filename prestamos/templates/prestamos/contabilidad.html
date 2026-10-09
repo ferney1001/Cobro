@@ -1,0 +1,297 @@
+{% load static %}
+{% load formato_dinero %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contabilidad</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/contabilidad.css' %}"
+    >
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <!-- ENCABEZADO -->
+        <header class="encabezado">
+
+            <div>
+
+                <h1>
+                    Contabilidad
+                </h1>
+
+                <p>
+                    Registro de movimientos
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="boton-volver"
+            >
+                ← Volver
+            </a>
+
+        </header>
+
+
+        <!-- PESTAÑAS -->
+        <nav class="pestanas">
+
+            <a
+                href="{% url 'contabilidad' %}"
+                class="pestana activa"
+            >
+                Contabilidad diaria
+            </a>
+
+            <a
+                href="{% url 'contabilidad_cliente' %}"
+                class="pestana"
+            >
+                Por cliente
+            </a>
+
+        </nav>
+
+
+        <!-- FILTRO DE FECHA -->
+        <section class="filtro-fecha">
+
+            <form method="get">
+
+                <label for="fecha">
+                    Fecha
+                </label>
+
+                <div class="fila-fecha">
+
+                    <input
+                        type="date"
+                        id="fecha"
+                        name="fecha"
+                        value="{{ fecha_consulta|date:'Y-m-d' }}"
+                    >
+
+                    <button type="submit">
+                        Consultar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- MOVIMIENTOS -->
+        <section class="seccion">
+
+            <div class="titulo-seccion">
+
+                <h2>
+                    Movimientos
+                </h2>
+
+                <span class="contador">
+                    {{ pagos|length }}
+                </span>
+
+            </div>
+
+
+            {% if pagos %}
+
+                <div class="tabla-contenedor">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Cuota
+                                </th>
+
+                                <th>
+                                    Cliente
+                                </th>
+
+                                <th>
+                                    Fecha
+                                </th>
+
+                                <th>
+                                    Tipo de pago
+                                </th>
+
+                                <th>
+                                    Medio
+                                </th>
+
+                                <th>
+                                    Valor
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for pago in pagos %}
+
+                                <tr>
+
+                                    <td>
+                                        #{{ pago.cuota.numero }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ pago.cuota.prestamo.cliente.nombre }}
+                                        {{ pago.cuota.prestamo.cliente.apellido }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ pago.fecha_hora|date:"d/m/Y H:i" }}
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if pago.tipo_pago == 'completo' %}
+
+                                            <span class="estado completo">
+                                                Pago completo
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="estado abono">
+                                                Abono
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if pago.medio_pago == 'efectivo' %}
+
+                                            Efectivo
+
+                                        {% elif pago.medio_pago == 'nequi' %}
+
+                                            Nequi
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td class="valor">
+
+                                        ${{ pago.monto|dinero }}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="sin-movimientos">
+
+                    <div class="icono-vacio">
+                        $
+                    </div>
+
+                    <h3>
+                        No hay movimientos
+                    </h3>
+
+                    <p>
+                        No se registraron pagos en esta fecha.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- TOTALES -->
+        <section class="totales">
+
+            <div class="tarjeta-total">
+
+                <span class="etiqueta">
+                    Total efectivo
+                </span>
+
+                <strong>
+                    ${{ total_efectivo|dinero }}
+                </strong>
+
+            </div>
+
+
+            <div class="tarjeta-total">
+
+                <span class="etiqueta">
+                    Total Nequi
+                </span>
+
+                <strong>
+                    ${{ total_nequi|dinero }}
+                </strong>
+
+            </div>
+
+
+            <div class="tarjeta-total total-recibido">
+
+                <span class="etiqueta">
+                    Total recibido
+                </span>
+
+                <strong>
+                    ${{ total_recibido|dinero }}
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

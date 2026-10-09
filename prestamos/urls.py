@@ -47,4 +47,16 @@ urlpatterns = [
         name='registrar_pago'
     ),
 
+    path(
+        'contabilidad/',
+        views.contabilidad,
+        name='contabilidad'
+    ),
+
+    path(
+        'contabilidad/cliente/',
+        views.contabilidad_cliente,
+        name='contabilidad_cliente'
+    ),
+
 ]

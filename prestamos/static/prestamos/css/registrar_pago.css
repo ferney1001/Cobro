@@ -243,7 +243,8 @@ body {
    INPUTS
 ========================================= */
 
-.campo input {
+.campo input,
+.campo select {
     width: 100%;
 
     min-height: 48px;
@@ -261,12 +262,14 @@ body {
 }
 
 
-.campo input:hover {
+.campo input:hover,
+.campo select:hover {
     border-color: #aeb7c2;
 }
 
 
-.campo input:focus {
+.campo input:focus,
+.campo select:focus {
     outline: none;
 
     border-color: #2563eb;
@@ -313,6 +316,7 @@ body {
         transform 0.05s ease;
 }
 
+
 .boton-pago-completo strong {
     white-space: nowrap;
 
@@ -320,6 +324,7 @@ body {
 
     font-size: 15px;
 }
+
 
 .boton-pago-completo:hover {
     background-color: #f0fdf4;
@@ -327,31 +332,11 @@ body {
     border-color: #15803d;
 }
 
+
 .boton-pago-completo:active {
     background-color: #dcfce7;
 
     transform: translateY(1px);
-}
-
-
-.boton-pago-completo strong {
-    white-space: nowrap;
-
-    color: #15803d;
-
-    font-size: 15px;
-}
-
-
-.boton-pago-completo:hover {
-    background-color: #dcfce7;
-
-    border-color: #4ade80;
-}
-
-
-.boton-pago-completo:active {
-    background-color: #bbf7d0;
 }
 
 
@@ -443,7 +428,7 @@ body {
     padding: 11px 16px;
 
     background-color: #2563eb;
-    
+
     text-decoration: none;
 
     border: none;
@@ -544,4 +529,4 @@ body {
         min-height: 52px;
     }
 
-}
+} 
