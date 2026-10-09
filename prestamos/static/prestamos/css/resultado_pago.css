@@ -1,0 +1,303 @@
+
+/* ==========================================
+   ESTILOS GENERALES
+   ========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+/* ==========================================
+   ENCABEZADO AZUL CON TÍTULO CENTRADO
+   ========================================== */
+
+.encabezado {
+    width: 100%;
+    padding: 24px 16px;
+    background: #2563eb;
+    color: #ffffff;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.20);
+}
+
+.encabezado-contenido {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.encabezado h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* ==========================================
+   CONTENEDOR PRINCIPAL
+   ========================================== */
+
+.contenedor {
+    width: 100%;
+    padding: 35px 16px;
+}
+
+.resultado {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+/* ==========================================
+   INFORMACIÓN DEL CLIENTE
+   ========================================== */
+
+.informacion-cliente {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.informacion-cliente h2 {
+    margin: 0 0 8px;
+    color: #0f172a;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.numero-prestamo {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ==========================================
+   DINERO RECIBIDO
+   ========================================== */
+
+.dinero-recibido {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+}
+
+.dinero-recibido span {
+    color: #1e40af;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.dinero-recibido strong {
+    color: #1d4ed8;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* ==========================================
+   DISTRIBUCIÓN DEL PAGO
+   ========================================== */
+
+.resultado h3 {
+    margin: 0 0 16px;
+    color: #0f172a;
+    font-size: 18px;
+}
+
+.resultado ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.resultado li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 16px;
+    margin-bottom: 10px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.datos-cuota {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.cuota-titulo {
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.fecha-pago {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.resultado li .monto-cuota {
+    color: #15803d;
+    font-size: 17px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ==========================================
+   TOTAL APLICADO
+   ========================================== */
+
+.total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 24px;
+    padding: 18px 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.total span {
+    color: #334155;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.total strong {
+    color: #15803d;
+    font-size: 21px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* ==========================================
+   CAMBIO A DEVOLVER
+   ========================================== */
+
+.cambio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 17px;
+    background-color: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+}
+
+.cambio span {
+    color: #9a3412;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cambio strong {
+    color: #c2410c;
+    font-size: 19px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ==========================================
+   BOTÓN VOLVER AL INICIO
+   ========================================== */
+
+.volver {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    transition: background-color 0.2s ease;
+}
+
+.volver:hover {
+    background-color: #1d4ed8;
+}
+
+/* ==========================================
+   DISEÑO PARA CELULARES
+   ========================================== */
+
+@media (max-width: 480px) {
+    .encabezado {
+        padding: 20px 12px;
+    }
+
+    .encabezado h1 {
+        font-size: 22px;
+    }
+
+    .contenedor {
+        padding: 20px 12px;
+    }
+
+    .resultado {
+        padding: 20px 16px;
+        border-radius: 12px;
+    }
+
+    .informacion-cliente h2 {
+        font-size: 20px;
+    }
+
+    .dinero-recibido {
+        padding: 16px;
+    }
+
+    .dinero-recibido strong {
+        font-size: 20px;
+    }
+
+    .resultado li {
+        padding: 15px 12px;
+        gap: 12px;
+    }
+
+    .resultado li .monto-cuota {
+        font-size: 15px;
+    }
+
+    .total strong {
+        font-size: 18px;
+    }
+
+    .cambio {
+        padding: 14px 12px;
+    }
+
+    .cambio span {
+        font-size: 13px;
+    }
+
+    .cambio strong {
+        font-size: 16px;
+    }
+}

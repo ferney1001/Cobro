@@ -440,7 +440,6 @@ def buscar_clientes(request):
     )
 
 
-
 @login_required
 def registrar_pago(request, cuota_id):
 
@@ -452,6 +451,7 @@ def registrar_pago(request, cuota_id):
         id=cuota_id
     )
 
+    # Calcular el pendiente de la cuota actual.
     abonado = cuota.pagos.aggregate(
         total=Sum('monto')
     )['total'] or 0
@@ -459,8 +459,10 @@ def registrar_pago(request, cuota_id):
     pendiente = cuota.valor - abonado
 
     if pendiente <= 0:
-        cuota.estado = 'pagada'
-        cuota.save()
+
+        if cuota.estado != 'pagada':
+            cuota.estado = 'pagada'
+            cuota.save(update_fields=['estado'])
 
         return render(
             request,
@@ -468,7 +470,7 @@ def registrar_pago(request, cuota_id):
             {'cuota': cuota}
         )
 
-    # Cargar las cuotas futuras del mismo préstamo.
+    # Obtener las cuotas futuras pendientes.
     cuotas_siguientes = (
         Cuota.objects
         .filter(
@@ -482,6 +484,7 @@ def registrar_pago(request, cuota_id):
     cuotas_disponibles = []
 
     for cuota_futura in cuotas_siguientes:
+
         abonado_futuro = sum(
             pago.monto
             for pago in cuota_futura.pagos.all()
@@ -496,6 +499,7 @@ def registrar_pago(request, cuota_id):
             cuota_futura.pendiente_calculado = pendiente_futuro
             cuotas_disponibles.append(cuota_futura)
 
+    # Procesar el formulario.
     if request.method == 'POST':
 
         formulario = PagoForm(request.POST)
@@ -505,15 +509,27 @@ def registrar_pago(request, cuota_id):
             monto_recibido = formulario.cleaned_data['monto']
 
             incluir_siguientes = (
-                request.POST.get('incluir_siguientes') == 'on'
+                request.POST.get('incluir_siguientes') == '1'
             )
 
             ids_seleccionados = request.POST.getlist(
                 'cuotas_siguientes'
             )
 
-            # Sin adelantos, se conserva la validación habitual.
-            if not incluir_siguientes and monto_recibido > pendiente:
+            # Evitar cuotas duplicadas en la selección.
+            if len(ids_seleccionados) != len(set(ids_seleccionados)):
+
+                formulario.add_error(
+                    None,
+                    'Hay cuotas seleccionadas más de una vez.'
+                )
+
+            # Sin adelantos, solo se puede pagar el pendiente actual.
+            elif (
+                not incluir_siguientes
+                and monto_recibido > pendiente
+            ):
+
                 formulario.add_error(
                     'monto',
                     (
@@ -528,7 +544,7 @@ def registrar_pago(request, cuota_id):
 
                 if incluir_siguientes and ids_seleccionados:
 
-                    cuotas_validas = list(
+                    cuotas_seleccionadas = list(
                         Cuota.objects
                         .filter(
                             prestamo=cuota.prestamo,
@@ -539,35 +555,91 @@ def registrar_pago(request, cuota_id):
                         .order_by('numero')
                     )
 
-                    # Rechazar identificadores que no sean
-                    # cuotas futuras de este préstamo.
                     ids_validos = {
-                        str(c.id) for c in cuotas_validas
+                        str(c.id)
+                        for c in cuotas_seleccionadas
                     }
 
+                    ids_disponibles = {
+                        str(c.id)
+                        for c in cuotas_disponibles
+                    }
+
+                    # Validar que sean cuotas futuras pendientes
+                    # del mismo préstamo.
                     if (
-                        len(ids_validos) != len(set(ids_seleccionados))
+                        len(cuotas_seleccionadas) != len(ids_seleccionados)
+                        or not set(ids_seleccionados).issubset(ids_validos)
+                        or not set(ids_seleccionados).issubset(ids_disponibles)
                     ):
+
                         formulario.add_error(
                             None,
-                            'Hay cuotas seleccionadas que no son válidas.'
+                            (
+                                'Una o más cuotas seleccionadas '
+                                'ya no están disponibles. Recarga la página.'
+                            )
                         )
 
                     else:
-                        cuotas_destino.extend(cuotas_validas)
 
-                # Si el dinero supera la cuota actual,
-                # debe existir al menos una cuota futura seleccionada.
+                        # No permitir saltarse cuotas pendientes.
+                        numeros_seleccionados = {
+                            c.numero
+                            for c in cuotas_seleccionadas
+                        }
+
+                        numeros_disponibles = [
+                            c.numero
+                            for c in cuotas_disponibles
+                        ]
+
+                        if numeros_seleccionados:
+
+                            ultimo_numero = max(
+                                numeros_seleccionados
+                            )
+
+                            cuotas_anteriores_pendientes = {
+                                numero
+                                for numero in numeros_disponibles
+                                if numero < ultimo_numero
+                            }
+
+                            if not cuotas_anteriores_pendientes.issubset(
+                                numeros_seleccionados
+                            ):
+
+                                formulario.add_error(
+                                    None,
+                                    (
+                                        'Selecciona también las cuotas '
+                                        'pendientes anteriores para no '
+                                        'saltarte ninguna.'
+                                    )
+                                )
+
+                        if not formulario.errors:
+                            cuotas_destino.extend(cuotas_seleccionadas)
+
+                # Si el dinero supera el pendiente actual,
+                # debe seleccionarse al menos una cuota futura.
                 if (
-                    incluir_siguientes
+                    not formulario.errors
+                    and incluir_siguientes
                     and monto_recibido > pendiente
                     and not ids_seleccionados
                 ):
+
                     formulario.add_error(
                         None,
-                        'Selecciona al menos una cuota futura para adelantar.'
+                        (
+                            'Selecciona al menos una cuota futura '
+                            'para distribuir el dinero adicional.'
+                        )
                     )
 
+                # Distribuir el dinero entre las cuotas autorizadas.
                 if not formulario.errors:
 
                     fecha_hora = formulario.cleaned_data['fecha_hora']
@@ -575,7 +647,6 @@ def registrar_pago(request, cuota_id):
 
                     monto_restante = monto_recibido
                     total_aplicado = 0
-                    cambio = 0
                     detalles_pagos = []
 
                     with transaction.atomic():
@@ -585,9 +656,10 @@ def registrar_pago(request, cuota_id):
                             if monto_restante <= 0:
                                 break
 
-                            abonado_destino = sum(
-                                pago.monto
-                                for pago in cuota_destino.pagos.all()
+                            abonado_destino = (
+                                cuota_destino.pagos.aggregate(
+                                    total=Sum('monto')
+                                )['total'] or 0
                             )
 
                             pendiente_destino = (
@@ -595,8 +667,13 @@ def registrar_pago(request, cuota_id):
                             )
 
                             if pendiente_destino <= 0:
-                                cuota_destino.estado = 'pagada'
-                                cuota_destino.save()
+
+                                if cuota_destino.estado != 'pagada':
+                                    cuota_destino.estado = 'pagada'
+                                    cuota_destino.save(
+                                        update_fields=['estado']
+                                    )
+
                                 continue
 
                             monto_aplicado = min(
@@ -607,7 +684,8 @@ def registrar_pago(request, cuota_id):
                             if monto_aplicado <= 0:
                                 continue
 
-                            Pago.objects.create(
+                            # Registrar cada parte como un Pago independiente.
+                            pago = Pago.objects.create(
                                 cuota=cuota_destino,
                                 monto=monto_aplicado,
                                 fecha_hora=fecha_hora,
@@ -620,6 +698,7 @@ def registrar_pago(request, cuota_id):
                             detalles_pagos.append({
                                 'cuota': cuota_destino,
                                 'monto': monto_aplicado,
+                                'pago': pago,
                             })
 
                             nuevo_abonado = (
@@ -628,27 +707,40 @@ def registrar_pago(request, cuota_id):
 
                             if nuevo_abonado >= cuota_destino.valor:
                                 cuota_destino.estado = 'pagada'
-                                cuota_destino.save()
+                                cuota_destino.save(
+                                    update_fields=['estado']
+                                )
 
-                        # El sobrante es cambio, no un pago.
-                        cambio = max(monto_restante, 0)
+                    # El dinero sobrante se devuelve como cambio.
+                    cambio = max(monto_restante, 0)
 
-                        prestamo = cuota.prestamo
+                    # Verificar si todas las cuotas quedaron pagadas.
+                    prestamo = cuota.prestamo
 
-                        todas_pagadas = not prestamo.cuotas.filter(
-                            estado='pendiente'
-                        ).exists()
+                    todas_pagadas = True
 
-                        if todas_pagadas:
-                            prestamo.activo = False
-                            prestamo.save()
+                    for cuota_revision in prestamo.cuotas.all():
+
+                        total_cuota = (
+                            cuota_revision.pagos.aggregate(
+                                total=Sum('monto')
+                            )['total'] or 0
+                        )
+
+                        if total_cuota < cuota_revision.valor:
+                            todas_pagadas = False
+                            break
+
+                    if todas_pagadas and prestamo.activo:
+                        prestamo.activo = False
+                        prestamo.save(update_fields=['activo'])
 
                     return render(
                         request,
                         'prestamos/resultado_pago.html',
                         {
                             'cuota': cuota,
-                            'prestamo': cuota.prestamo,
+                            'prestamo': prestamo,
                             'monto_recibido': monto_recibido,
                             'total_aplicado': total_aplicado,
                             'cambio': cambio,
@@ -659,6 +751,7 @@ def registrar_pago(request, cuota_id):
     else:
         formulario = PagoForm()
 
+    # Mostrar nuevamente la pantalla de registro.
     return render(
         request,
         'prestamos/registrar_pago.html',

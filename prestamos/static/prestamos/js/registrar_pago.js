@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
 
     const formulario = document.getElementById('formulario-pago');
@@ -14,6 +15,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const campoFechaHora =
         document.querySelector('input[name="fecha_hora"]');
 
+    const checkboxIncluir =
+        document.getElementById('incluir-siguientes');
+
+    const contenedorCuotas =
+        document.getElementById('contenedor-cuotas-siguientes');
+
+    const casillasCuotas = document.querySelectorAll(
+        '.checkbox-cuota-siguiente'
+    );
+
+
+    /*
+    =========================================
+    MOSTRAR U OCULTAR CUOTAS FUTURAS
+    =========================================
+    */
+
+    console.log('JavaScript de registrar pago cargado.');
+
+    console.log('Casilla de cuotas:', checkboxIncluir);
+    console.log('Contenedor de cuotas:', contenedorCuotas);
+    console.log('Cantidad de cuotas:', casillasCuotas.length);
+
+    if (checkboxIncluir && contenedorCuotas) {
+
+        function actualizarCuotas() {
+
+            const activado = checkboxIncluir.checked;
+
+            contenedorCuotas.hidden = !activado;
+
+            checkboxIncluir.setAttribute(
+                'aria-expanded',
+                String(activado)
+            );
+
+            casillasCuotas.forEach(function (casilla) {
+
+                casilla.disabled = !activado;
+
+                if (!activado) {
+                    casilla.checked = false;
+                }
+
+            });
+
+            console.log(
+                'Cuotas futuras visibles:',
+                activado
+            );
+
+        }
+
+        checkboxIncluir.addEventListener(
+            'change',
+            actualizarCuotas
+        );
+
+        actualizarCuotas();
+
+    } else {
+
+        console.error(
+            'No se encontró la casilla o el contenedor de cuotas futuras.'
+        );
+
+    }
+
 
     /*
     =========================================
@@ -23,8 +92,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function obtenerNumero(valor) {
 
-        return valor
-            .replace(/\D/g, '');
+        return valor.replace(/\D/g, '');
+
     }
 
 
@@ -37,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         return parseInt(numero, 10).toLocaleString('es-CO');
+
     }
 
 
@@ -44,11 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         campoMonto.addEventListener('input', function () {
 
-            const posicionFinal =
-                campoMonto.value.length;
-
-            campoMonto.value =
-                formatearMonto(campoMonto.value);
+            campoMonto.value = formatearMonto(campoMonto.value);
 
         });
 
@@ -65,14 +131,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         botonPagoCompleto.addEventListener('click', function () {
 
-            const pendiente =
-                botonPagoCompleto.dataset.pendiente;
+            const pendiente = botonPagoCompleto.dataset.pendiente;
 
             if (pendiente) {
-
-                campoMonto.value =
-                    formatearMonto(pendiente);
-
+                campoMonto.value = formatearMonto(pendiente);
             }
 
         });
@@ -92,20 +154,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const ahora = new Date();
 
-            const año =
-                ahora.getFullYear();
+            const año = ahora.getFullYear();
 
-            const mes =
-                String(ahora.getMonth() + 1).padStart(2, '0');
+            const mes = String(
+                ahora.getMonth() + 1
+            ).padStart(2, '0');
 
-            const dia =
-                String(ahora.getDate()).padStart(2, '0');
+            const dia = String(
+                ahora.getDate()
+            ).padStart(2, '0');
 
-            const hora =
-                String(ahora.getHours()).padStart(2, '0');
+            const hora = String(
+                ahora.getHours()
+            ).padStart(2, '0');
 
-            const minutos =
-                String(ahora.getMinutes()).padStart(2, '0');
+            const minutos = String(
+                ahora.getMinutes()
+            ).padStart(2, '0');
 
             campoFechaHora.value =
                 `${año}-${mes}-${dia}T${hora}:${minutos}`;
@@ -127,9 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
             formulario.dataset.tieneErrores === 'true';
 
         if (!tieneErrores) {
-
             campoFechaHora.value = '';
-
         }
 
     }
@@ -145,8 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         formulario.addEventListener('submit', function () {
 
-            campoMonto.value =
-                obtenerNumero(campoMonto.value);
+            campoMonto.value = obtenerNumero(campoMonto.value);
 
         });
 

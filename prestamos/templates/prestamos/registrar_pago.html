@@ -1,3 +1,4 @@
+
 {% load static %}
 {% load formato_dinero %}
 
@@ -6,11 +7,7 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Registrar pago - Cobro</title>
 
@@ -23,34 +20,20 @@
 <body>
 
     <header class="encabezado">
-
         <div class="encabezado-contenido">
-
-            <h1>
-                Registrar pago
-            </h1>
-
+            <h1>Registrar pago</h1>
         </div>
-
     </header>
-
 
     <main class="contenedor">
 
-        <a
-            href="{% url 'dashboard' %}"
-            class="boton-volver"
-        >
+        <a href="{% url 'dashboard' %}" class="boton-volver">
             ← Volver al inicio
         </a>
 
-
         <section class="tarjeta">
 
-
-            <!-- =========================
-                 INFORMACIÓN DEL CLIENTE
-            ========================== -->
+            <!-- INFORMACIÓN DEL CLIENTE -->
 
             <div class="cliente">
 
@@ -67,57 +50,28 @@
 
             </div>
 
-
-            <!-- =========================
-                 RESUMEN
-            ========================== -->
+            <!-- RESUMEN DE LA CUOTA ACTUAL -->
 
             <div class="resumen">
 
                 <div class="dato">
-
-                    <span>
-                        Valor de la cuota
-                    </span>
-
-                    <strong>
-                        ${{ cuota.valor|dinero }}
-                    </strong>
-
+                    <span>Valor de la cuota</span>
+                    <strong>${{ cuota.valor|dinero }}</strong>
                 </div>
-
 
                 <div class="dato">
-
-                    <span>
-                        Abonado
-                    </span>
-
-                    <strong>
-                        ${{ abonado|dinero }}
-                    </strong>
-
+                    <span>Abonado</span>
+                    <strong>${{ abonado|dinero }}</strong>
                 </div>
 
-
                 <div class="dato pendiente">
-
-                    <span>
-                        Pendiente
-                    </span>
-
-                    <strong>
-                        ${{ pendiente|dinero }}
-                    </strong>
-
+                    <span>Pendiente</span>
+                    <strong>${{ pendiente|dinero }}</strong>
                 </div>
 
             </div>
 
-
-            <!-- =========================
-                 FORMULARIO
-            ========================== -->
+            <!-- FORMULARIO DE PAGO -->
 
             <form
                 method="post"
@@ -128,24 +82,17 @@
 
                 {% csrf_token %}
 
-
-                <!-- =========================
-                     MONTO
-                ========================== -->
+                <!-- MONTO DEL PAGO -->
 
                 <div class="campo">
 
-                    <label>
+                    <label for="{{ formulario.monto.id_for_label }}">
                         ¿Cuánto va a pagar?
                     </label>
 
-
                     <p class="texto-seleccion">
-                        Selecciona cómo registrar el pago
+                        Selecciona cómo registrar el pago.
                     </p>
-
-
-                    <!-- PAGO COMPLETO -->
 
                     <button
                         type="button"
@@ -156,25 +103,15 @@
 
                         <span class="pago-completo-texto">
 
-                            <span class="pago-completo-icono">
-                                ✓
-                            </span>
+                            <span class="pago-completo-icono">✓</span>
 
-                            <span>
-                                Pagar cuota completa
-                            </span>
+                            <span>Pagar cuota completa</span>
 
                         </span>
 
-
-                        <strong>
-                            ${{ pendiente|dinero }}
-                        </strong>
+                        <strong>${{ pendiente|dinero }}</strong>
 
                     </button>
-
-
-                    <!-- MONTO MANUAL -->
 
                     <label
                         for="{{ formulario.monto.id_for_label }}"
@@ -183,60 +120,117 @@
                         O ingresa otro valor
                     </label>
 
-
                     {{ formulario.monto }}
 
-
                     {% if formulario.monto.errors %}
-
                         <div class="error">
                             {{ formulario.monto.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
-
-                <!-- =========================
-                     MEDIO DE PAGO
-                ========================== -->
+                <!-- CUOTAS FUTURAS -->
 
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.medio_pago.id_for_label }}"
-                    >
+                    <label for="incluir-siguientes">
+
+                        <input
+                            type="checkbox"
+                            id="incluir-siguientes"
+                            name="incluir_siguientes"
+                            value="1"
+                            aria-controls="contenedor-cuotas-siguientes"
+                            aria-expanded="false"
+                        >
+
+                        Incluir otras cuotas en este pago
+
+                    </label>
+
+                    <p class="ayuda">
+                        Si deseas destinar parte del dinero recibido
+                        a otras cuotas, activa esta opción y selecciona
+                        las cuotas que deseas abonar.
+                    </p>
+
+                </div>
+
+                <div id="contenedor-cuotas-siguientes" hidden>
+
+                    <h3>Selecciona las cuotas que deseas abonar</h3>
+
+                    <p class="ayuda">
+                        Puedes seleccionar una o varias cuotas futuras.
+                        Si el dinero no alcanza para cubrir una cuota,
+                        esta podrá quedar con un saldo pendiente,
+                        siempre que el sistema registre correctamente
+                        los abonos parciales.
+                    </p>
+
+                    {% for cuota_siguiente in cuotas_siguientes %}
+
+                        <div class="campo cuota-siguiente">
+
+                            <label>
+
+                                <input
+                                    type="checkbox"
+                                    class="checkbox-cuota-siguiente"
+                                    name="cuotas_siguientes"
+                                    value="{{ cuota_siguiente.id }}"
+                                    disabled
+                                >
+
+                                <span class="cuota-numero">
+                                    Cuota {{ cuota_siguiente.numero }}
+                                </span>
+
+                                <span class="cuota-pendiente">
+                                    Pendiente:
+                                    <strong>${{ cuota_siguiente.pendiente_calculado|dinero }}</strong>
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    {% empty %}
+
+                        <p class="ayuda">
+                            No hay cuotas futuras pendientes.
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+
+                <!-- MEDIO DE PAGO -->
+
+                <div class="campo">
+
+                    <label for="{{ formulario.medio_pago.id_for_label }}">
                         Medio de pago
                     </label>
 
-
                     {{ formulario.medio_pago }}
 
-
                     {% if formulario.medio_pago.errors %}
-
                         <div class="error">
                             {{ formulario.medio_pago.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
-
-                <!-- =========================
-                     FECHA Y HORA
-                ========================== -->
+                <!-- FECHA Y HORA -->
 
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.fecha_hora.id_for_label }}"
-                    >
+                    <label for="{{ formulario.fecha_hora.id_for_label }}">
                         Fecha y hora del pago
                     </label>
-
 
                     <button
                         type="button"
@@ -246,43 +240,30 @@
                         Usar fecha y hora actual
                     </button>
 
-
                     {{ formulario.fecha_hora }}
-
 
                     <small class="ayuda">
                         Puedes seleccionar una fecha anterior si el pago
                         se realizó otro día.
                     </small>
 
-
                     {% if formulario.fecha_hora.errors %}
-
                         <div class="error">
                             {{ formulario.fecha_hora.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
-
-                <!-- =========================
-                     ERRORES GENERALES
-                ========================== -->
+                <!-- ERRORES GENERALES -->
 
                 {% if formulario.non_field_errors %}
-
                     <div class="error">
                         {{ formulario.non_field_errors }}
                     </div>
-
                 {% endif %}
 
-
-                <!-- =========================
-                     CONFIRMAR
-                ========================== -->
+                <!-- CONFIRMAR PAGO -->
 
                 <button
                     type="submit"
@@ -297,10 +278,9 @@
 
     </main>
 
+    <!-- JAVASCRIPT EXTERNO -->
 
-    <script
-        src="{% static 'prestamos/js/registrar_pago.js' %}"
-    ></script>
+    <script src="{% static 'prestamos/js/registrar_pago.js' %}"></script>
 
 </body>
 

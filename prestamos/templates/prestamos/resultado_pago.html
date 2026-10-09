@@ -1,4 +1,3 @@
-
 {% load static %}
 {% load formato_dinero %}
 
@@ -7,87 +6,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Pago registrado - Cobro</title>
-    <link rel="stylesheet" href="{% static 'prestamos/css/registrar_pago.css' %}">
-    <style>
-        .resultado {
-            max-width: 600px;
-            margin: 24px auto;
-            padding: 24px;
-            background: white;
-            border-radius: 12px;
-        }
 
-        .resultado li {
-            margin: 12px 0;
-        }
-
-        .total {
-            margin-top: 20px;
-            padding: 12px;
-            background: #f0fdf4;
-            border-radius: 8px;
-        }
-
-        .cambio {
-            margin-top: 12px;
-            padding: 12px;
-            background: #fff7ed;
-            border-radius: 8px;
-        }
-
-        .volver {
-            display: inline-block;
-            margin-top: 20px;
-        }
-    </style>
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/resultado_pago.css' %}"
+    >
 </head>
 <body>
 
     <header class="encabezado">
         <div class="encabezado-contenido">
-            <h1>Pago registrado</h1>
+            <h1>✓ Pago registrado</h1>
         </div>
     </header>
 
     <main class="contenedor">
         <section class="resultado">
 
-            <h2>
-                {{ prestamo.cliente.nombre }}
-                {{ prestamo.cliente.apellido }}
-            </h2>
+            <div class="informacion-cliente">
+                <h2>
+                    {{ prestamo.cliente.nombre }}
+                    {{ prestamo.cliente.apellido }}
+                </h2>
 
-            <p>
-                Préstamo #{{ prestamo.numero_prestamo }}
-            </p>
+                <p class="numero-prestamo">
+                    Préstamo #{{ prestamo.numero_prestamo }}
+                </p>
+            </div>
 
-            <p>
-                Dinero recibido:
+            <div class="dinero-recibido">
+                <span>Dinero recibido</span>
                 <strong>${{ monto_recibido|dinero }}</strong>
-            </p>
+            </div>
 
             <h3>Distribución del pago</h3>
 
             <ul>
                 {% for detalle in detalles_pagos %}
                     <li>
-                        Cuota {{ detalle.cuota.numero }}
-                        — fecha original:
-                        {{ detalle.cuota.fecha_cobro|date:"d/m/Y" }}
-                        — aplicado:
-                        <strong>${{ detalle.monto|dinero }}</strong>
+                        <div class="datos-cuota">
+                            <strong class="cuota-titulo">
+                                Cuota {{ detalle.cuota.numero }}
+                            </strong>
+
+                            <span class="fecha-pago">
+                                Fecha de pago:
+                                {{ detalle.pago.fecha_hora|date:"d/m/Y H:i" }}
+                            </span>
+                        </div>
+
+                        <strong class="monto-cuota">
+                            ${{ detalle.monto|dinero }}
+                        </strong>
                     </li>
                 {% endfor %}
             </ul>
 
             <div class="total">
-                Total aplicado:
+                <span>Total aplicado</span>
                 <strong>${{ total_aplicado|dinero }}</strong>
             </div>
 
             <div class="cambio">
-                Cambio que se debe devolver:
+                <span>Cambio que se debe devolver</span>
                 <strong>${{ cambio|dinero }}</strong>
             </div>
 

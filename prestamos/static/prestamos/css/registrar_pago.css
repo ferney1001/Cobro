@@ -530,3 +530,97 @@ body {
     }
 
 } 
+
+
+/* =========================================
+   CUOTAS FUTURAS
+========================================= */
+
+#contenedor-cuotas-siguientes {
+    margin-top: 8px;
+}
+
+#contenedor-cuotas-siguientes h3 {
+    margin: 0 0 10px;
+    color: #111827;
+    font-size: 17px;
+    line-height: 1.4;
+}
+
+.cuota-siguiente {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.cuota-siguiente label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+
+    width: 100%;
+    padding: 14px;
+
+    background-color: #ffffff;
+    border: 1px solid #dce2e8;
+    border-radius: 9px;
+
+    cursor: pointer;
+}
+
+.cuota-siguiente label:hover {
+    background-color: #f8fafc;
+    border-color: #93b4f5;
+}
+
+.cuota-siguiente .checkbox-cuota-siguiente {
+    flex: 0 0 18px;
+    width: 18px;
+    min-height: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.cuota-numero {
+    flex: 1;
+    min-width: 0;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.cuota-pendiente {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    text-align: right;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.cuota-pendiente strong {
+    color: #1d4ed8;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+    .cuota-siguiente label {
+        gap: 8px;
+        padding: 11px;
+    }
+
+    .cuota-numero {
+        font-size: 13px;
+    }
+
+    .cuota-pendiente strong {
+        font-size: 14px;
+    }
+}

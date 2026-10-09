@@ -187,6 +187,8 @@ class PagoForm(forms.ModelForm):
             ('nequi', '📱 Nequi'),
         ]
 
+        self.fields['medio_pago'].required = True
+
     def clean_monto(self):
 
         valor = self.cleaned_data['monto']
