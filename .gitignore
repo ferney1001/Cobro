@@ -1,3 +1,4 @@
+
 # Entorno virtual
 venv/
 
@@ -7,3 +8,16 @@ __pycache__/
 
 # Base de datos local
 db.sqlite3
+db.sqlite3.backup
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Archivos estáticos generados para producción
+staticfiles/
+
+# Archivos locales y de despliegue
+.env
+*.log

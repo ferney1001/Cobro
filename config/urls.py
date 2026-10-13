@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path
+from django.shortcuts import redirect
 
 urlpatterns = [
+    path('', lambda request: redirect('login'), name='inicio'),
+
     path('admin/', admin.site.urls),
 
     path(
