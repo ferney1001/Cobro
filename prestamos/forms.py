@@ -1,3 +1,4 @@
+
 from decimal import Decimal
 
 from django import forms
@@ -9,7 +10,6 @@ from .models import Prestamo, Pago
 class PrestamoForm(forms.ModelForm):
 
     class Meta:
-
         model = Prestamo
 
         fields = [
@@ -19,6 +19,7 @@ class PrestamoForm(forms.ModelForm):
             'porcentaje_interes',
             'frecuencia',
             'numero_cuotas',
+            'plazo_meses',
             'fecha_prestamo',
             'fecha_primer_cobro',
         ]
@@ -26,12 +27,14 @@ class PrestamoForm(forms.ModelForm):
         widgets = {
             'cliente': forms.HiddenInput(),
             'tipo_prestamo': forms.Select(),
+
             'monto': forms.TextInput(
                 attrs={
                     'inputmode': 'numeric',
                     'autocomplete': 'off'
                 }
             ),
+
             'porcentaje_interes': forms.NumberInput(
                 attrs={
                     'type': 'number',
@@ -39,6 +42,7 @@ class PrestamoForm(forms.ModelForm):
                     'min': '0',
                 }
             ),
+
             'numero_cuotas': forms.NumberInput(
                 attrs={
                     'type': 'number',
@@ -47,10 +51,21 @@ class PrestamoForm(forms.ModelForm):
                     'inputmode': 'numeric',
                 }
             ),
+
+            'plazo_meses': forms.NumberInput(
+                attrs={
+                    'type': 'number',
+                    'step': '1',
+                    'min': '1',
+                    'inputmode': 'numeric',
+                }
+            ),
+
             'fecha_prestamo': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
             ),
+
             'fecha_primer_cobro': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
@@ -74,14 +89,15 @@ class PrestamoForm(forms.ModelForm):
             ('mensual', 'Mensual'),
         ]
 
+        self.fields['plazo_meses'].required = True
+
         if not self.instance.pk:
             self.initial['fecha_prestamo'] = timezone.localdate()
-
+            self.initial['plazo_meses'] = None
 
 class PrestamoEditarForm(forms.ModelForm):
 
     class Meta:
-
         model = Prestamo
 
         fields = [
@@ -90,12 +106,14 @@ class PrestamoEditarForm(forms.ModelForm):
             'porcentaje_interes',
             'frecuencia',
             'numero_cuotas',
+            'plazo_meses',
             'fecha_prestamo',
             'fecha_primer_cobro',
         ]
 
         widgets = {
             'tipo_prestamo': forms.Select(),
+
             'monto': forms.NumberInput(
                 attrs={
                     'type': 'number',
@@ -104,6 +122,7 @@ class PrestamoEditarForm(forms.ModelForm):
                     'inputmode': 'numeric',
                 }
             ),
+
             'porcentaje_interes': forms.NumberInput(
                 attrs={
                     'type': 'number',
@@ -111,6 +130,7 @@ class PrestamoEditarForm(forms.ModelForm):
                     'min': '0',
                 }
             ),
+
             'numero_cuotas': forms.NumberInput(
                 attrs={
                     'type': 'number',
@@ -119,10 +139,21 @@ class PrestamoEditarForm(forms.ModelForm):
                     'inputmode': 'numeric',
                 }
             ),
+
+            'plazo_meses': forms.NumberInput(
+                attrs={
+                    'type': 'number',
+                    'step': '1',
+                    'min': '1',
+                    'inputmode': 'numeric',
+                }
+            ),
+
             'fecha_prestamo': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
             ),
+
             'fecha_primer_cobro': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
@@ -150,7 +181,6 @@ class PrestamoEditarForm(forms.ModelForm):
 class PagoForm(forms.ModelForm):
 
     class Meta:
-
         model = Pago
 
         fields = [
@@ -166,10 +196,12 @@ class PagoForm(forms.ModelForm):
                     'autocomplete': 'off'
                 }
             ),
+
             'fecha_hora': forms.DateTimeInput(
                 format='%Y-%m-%dT%H:%M',
                 attrs={'type': 'datetime-local'}
             ),
+
             'medio_pago': forms.Select(),
         }
 

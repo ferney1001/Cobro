@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -27,9 +28,15 @@
 
     </header>
 
-
     <main class="contenedor">
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mensaje-exito">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
         <a
             href="{% url 'lista_prestamos' %}"
@@ -38,17 +45,11 @@
             ← Volver a préstamos
         </a>
 
-
         <form method="post" class="formulario">
 
             {% csrf_token %}
 
-
-            <!--
-                =========================================
-                CLIENTE
-                =========================================
-            -->
+            <!-- CLIENTE -->
 
             <div class="campo">
 
@@ -74,12 +75,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                TIPO DE PRÉSTAMO
-                =========================================
-            -->
+            <!-- TIPO DE PRÉSTAMO -->
 
             <div class="campo">
 
@@ -91,12 +87,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                MONTO
-                =========================================
-            -->
+            <!-- MONTO -->
 
             <div class="campo">
 
@@ -108,12 +99,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                PORCENTAJE DE INTERÉS
-                =========================================
-            -->
+            <!-- PORCENTAJE DE INTERÉS -->
 
             <div class="campo">
 
@@ -125,12 +111,19 @@
 
             </div>
 
+            <!-- PLAZO EN MESES -->
 
-            <!--
-                =========================================
-                FRECUENCIA
-                =========================================
-            -->
+            <div class="campo">
+
+                {{ formulario.plazo_meses.label_tag }}
+
+                {{ formulario.plazo_meses }}
+
+                {{ formulario.plazo_meses.errors }}
+
+            </div>
+
+            <!-- FRECUENCIA -->
 
             <div class="campo">
 
@@ -142,12 +135,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                NÚMERO DE CUOTAS
-                =========================================
-            -->
+            <!-- NÚMERO DE CUOTAS -->
 
             <div class="campo">
 
@@ -159,12 +147,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                RESUMEN
-                =========================================
-            -->
+            <!-- RESUMEN -->
 
             <div
                 id="resumen-prestamo"
@@ -174,7 +157,6 @@
                 <h2>
                     Resumen del préstamo
                 </h2>
-
 
                 <p>
 
@@ -186,7 +168,6 @@
 
                 </p>
 
-
                 <p>
 
                     Total a pagar:
@@ -196,7 +177,6 @@
                     </strong>
 
                 </p>
-
 
                 <p>
 
@@ -210,12 +190,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                FECHA DEL PRÉSTAMO
-                =========================================
-            -->
+            <!-- FECHA DEL PRÉSTAMO -->
 
             <div class="campo">
 
@@ -227,12 +202,7 @@
 
             </div>
 
-
-            <!--
-                =========================================
-                PRIMER COBRO
-                =========================================
-            -->
+            <!-- PRIMER COBRO -->
 
             <div class="campo">
 
@@ -244,20 +214,19 @@
 
             </div>
 
+            <!-- BOTÓN CREAR -->
 
             <button
                 type="submit"
                 class="boton"
+                id="boton-crear"
             >
-
                 Crear préstamo
-
             </button>
 
         </form>
 
     </main>
-
 
     <script src="{% static 'prestamos/js/prestamos.js' %}"></script>
 

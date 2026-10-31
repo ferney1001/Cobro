@@ -1,3 +1,4 @@
+
 from datetime import date, timedelta
 from decimal import Decimal, ROUND_HALF_UP
 import calendar
@@ -57,6 +58,10 @@ class Prestamo(models.Model):
 
     numero_cuotas = models.PositiveIntegerField()
 
+    plazo_meses = models.PositiveIntegerField(
+        default=1
+    )
+
     fecha_prestamo = models.DateField()
 
     fecha_primer_cobro = models.DateField()
@@ -69,39 +74,45 @@ class Prestamo(models.Model):
         auto_now_add=True
     )
 
-
     def __str__(self):
-
         return f"Préstamo de {self.cliente} - ${self.monto}"
-
 
     def clean(self):
 
         if self.fecha_primer_cobro < self.fecha_prestamo:
-
             raise ValidationError(
                 'La fecha del primer cobro no puede ser anterior '
                 'a la fecha del préstamo.'
             )
 
         if self.monto <= 0:
-
             raise ValidationError(
                 'El monto del préstamo debe ser mayor que cero.'
             )
 
         if self.numero_cuotas <= 0:
-
             raise ValidationError(
                 'El número de cuotas debe ser mayor que cero.'
             )
 
-        if self.porcentaje_interes < 0:
+        if self.plazo_meses <= 0:
+            raise ValidationError(
+                'El plazo debe ser de al menos un mes.'
+            )
 
+        if (
+            self.tipo_prestamo == 'solo_intereses'
+            and self.frecuencia != 'mensual'
+        ):
+            raise ValidationError(
+                'Los préstamos de solo intereses '
+                'deben tener frecuencia mensual.'
+            )
+
+        if self.porcentaje_interes < 0:
             raise ValidationError(
                 'El porcentaje de interés no puede ser negativo.'
             )
-
 
     def save(self, *args, **kwargs):
 
@@ -116,247 +127,123 @@ class Prestamo(models.Model):
             )['max_numero']
 
             if ultimo_numero is None:
-
                 self.numero_prestamo = 1
-
             else:
-
-                self.numero_prestamo = (
-                    ultimo_numero + 1
-                )
+                self.numero_prestamo = ultimo_numero + 1
 
         super().save(*args, **kwargs)
 
         if es_nuevo:
-
             self.crear_cuotas()
-
 
     def crear_cuotas(self):
 
-        # =========================================
-        # SOLO INTERESES
-        # =========================================
-
-        if self.tipo_prestamo == 'solo_intereses':
-
-            interes_periodo = (
-                self.monto *
-                self.porcentaje_interes /
-                Decimal('100')
-            )
-
-            interes_periodo = interes_periodo.quantize(
-                Decimal('1'),
-                rounding=ROUND_HALF_UP
-            )
-
-            # Redondear el interés de cada período
-            # al múltiplo de $50 más cercano.
-            interes_redondeado = (
-                (interes_periodo / Decimal('50'))
-                .quantize(
-                    Decimal('1'),
-                    rounding=ROUND_HALF_UP
-                )
-                * Decimal('50')
-            )
-
-            for numero in range(
-                1,
-                self.numero_cuotas + 1
-            ):
-
-                fecha_cobro = self.calcular_fecha_cobro(
-                    numero
-                )
-
-                Cuota.objects.create(
-                    prestamo=self,
-                    numero=numero,
-                    fecha_cobro=fecha_cobro,
-                    valor=interes_redondeado
-                )
-
-            return
-
-
-        # =========================================
-        # CAPITAL + INTERESES EN CUOTAS
-        # =========================================
-
-        interes_periodo = (
+        # Calcular los intereses del plazo
+        interes_mensual = (
             self.monto *
             self.porcentaje_interes /
             Decimal('100')
         )
 
         interes_total = (
-            interes_periodo *
-            self.numero_cuotas
+            interes_mensual *
+            self.plazo_meses
         )
 
-        total = (
-            self.monto +
-            interes_total
-        )
+        # Definir el total según la modalidad
+        if self.tipo_prestamo == 'solo_intereses':
+            total = interes_total
+        else:
+            total = self.monto + interes_total
 
         total = total.quantize(
             Decimal('1'),
             rounding=ROUND_HALF_UP
         )
 
+        # Calcular el valor base de cada cuota
+        valor_base = total / self.numero_cuotas
 
-        # Valor aproximado de cada cuota.
-        valor_base = (
-            total /
-            self.numero_cuotas
-        )
-
-
-        # Redondear la cuota al múltiplo
-        # de $50 más cercano.
         valor_redondeado = (
-            (valor_base / Decimal('50'))
-            .quantize(
+            (valor_base / Decimal('50')).quantize(
                 Decimal('1'),
                 rounding=ROUND_HALF_UP
-            )
-            * Decimal('50')
+            ) * Decimal('50')
         )
 
-
-        # =========================================
-        # AJUSTE PARA CONSERVAR EL TOTAL EXACTO
-        # =========================================
-
+        # Ajustar para conservar el total exacto
         total_redondeado = (
             valor_redondeado *
             self.numero_cuotas
         )
 
-        diferencia = (
-            total -
-            total_redondeado
-        )
+        diferencia = total - total_redondeado
 
-
-        # Cantidad de bloques de $50
-        # que debemos corregir.
         bloques = int(
             abs(diferencia) / Decimal('50')
         )
 
+        resto = (
+            abs(diferencia) -
+            Decimal(bloques * 50)
+        )
 
-        # =========================================
-        # CUOTAS POR ENCIMA DEL TOTAL
-        # =========================================
+        # Crear las cuotas
+        for numero in range(1, self.numero_cuotas + 1):
 
-        if diferencia < 0:
+            valor = valor_redondeado
 
-            for numero in range(
-                1,
-                self.numero_cuotas + 1
-            ):
-
-                valor = valor_redondeado
-
-                if numero <= bloques:
-
+            if numero <= bloques:
+                if diferencia < 0:
                     valor -= Decimal('50')
-
-                fecha_cobro = self.calcular_fecha_cobro(
-                    numero
-                )
-
-                Cuota.objects.create(
-                    prestamo=self,
-                    numero=numero,
-                    fecha_cobro=fecha_cobro,
-                    valor=valor
-                )
-
-
-        # =========================================
-        # CUOTAS POR DEBAJO DEL TOTAL
-        # =========================================
-
-        else:
-
-            for numero in range(
-                1,
-                self.numero_cuotas + 1
-            ):
-
-                valor = valor_redondeado
-
-                if numero <= bloques:
-
+                else:
                     valor += Decimal('50')
 
-                fecha_cobro = self.calcular_fecha_cobro(
-                    numero
-                )
+            # Ajustar los pesos restantes en la primera cuota
+            if numero == 1 and resto > 0:
+                if diferencia < 0:
+                    valor -= resto
+                else:
+                    valor += resto
 
-                Cuota.objects.create(
-                    prestamo=self,
-                    numero=numero,
-                    fecha_cobro=fecha_cobro,
-                    valor=valor
-                )
+            fecha_cobro = self.calcular_fecha_cobro(numero)
 
+            Cuota.objects.create(
+                prestamo=self,
+                numero=numero,
+                fecha_cobro=fecha_cobro,
+                valor=valor
+            )
 
     def calcular_fecha_cobro(self, numero):
 
-        # =========================================
-        # DIARIA
-        # =========================================
-
+        # Diaria
         if self.frecuencia == 'diaria':
-
             return (
                 self.fecha_primer_cobro +
                 timedelta(days=numero - 1)
             )
 
-
-        # =========================================
-        # SEMANAL
-        # =========================================
-
+        # Semanal
         if self.frecuencia == 'semanal':
-
             return (
                 self.fecha_primer_cobro +
                 timedelta(weeks=numero - 1)
             )
 
-
-        # =========================================
-        # QUINCENAL
-        # =========================================
-
+        # Cada 15 días
         if self.frecuencia == 'quincenal':
-
             return (
                 self.fecha_primer_cobro +
-                timedelta(
-                    days=15 * (numero - 1)
-                )
+                timedelta(days=15 * (numero - 1))
             )
 
-
-        # =========================================
-        # MENSUAL
-        # =========================================
-
+        # Mensual
         if self.frecuencia == 'mensual':
-
             return sumar_meses(
                 self.fecha_primer_cobro,
                 numero - 1
             )
-
 
         return self.fecha_primer_cobro
 
@@ -364,9 +251,7 @@ class Prestamo(models.Model):
 def sumar_meses(fecha, meses):
 
     mes_total = (
-        fecha.month -
-        1 +
-        meses
+        fecha.month - 1 + meses
     )
 
     año = (
@@ -375,8 +260,7 @@ def sumar_meses(fecha, meses):
     )
 
     mes = (
-        mes_total % 12 +
-        1
+        mes_total % 12 + 1
     )
 
     ultimo_dia = calendar.monthrange(
@@ -424,9 +308,7 @@ class Cuota(models.Model):
         default='pendiente'
     )
 
-
     def __str__(self):
-
         return (
             f"Cuota {self.numero} - "
             f"{self.prestamo.cliente}"
@@ -460,9 +342,7 @@ class Pago(models.Model):
         blank=True
     )
 
-
     def __str__(self):
-
         return (
             f"Pago de ${self.monto} - "
             f"{self.cuota}"

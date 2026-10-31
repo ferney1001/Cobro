@@ -11,7 +11,7 @@ from django.utils import timezone
 from clientes.models import Cliente
 from .forms import PrestamoForm, PrestamoEditarForm, PagoForm
 from .models import Prestamo, Cuota, Pago
-
+from django.contrib import messages
 
 @login_required
 def crear_prestamo(request):
@@ -22,7 +22,12 @@ def crear_prestamo(request):
 
         if formulario.is_valid():
 
-            formulario.save()
+            prestamo = formulario.save()
+
+            messages.success(
+                request,
+                f'¡Préstamo #{prestamo.numero_prestamo} creado correctamente!'
+            )
 
             return redirect('crear_prestamo')
 
@@ -37,7 +42,6 @@ def crear_prestamo(request):
             'formulario': formulario
         }
     )
-
 
 @login_required
 def lista_prestamos(request):
@@ -120,6 +124,8 @@ def lista_prestamos(request):
         )
         prestamo.estado_calculado = estado_calculado
 
+        # Indicar si el préstamo tiene pagos registrados.
+        prestamo.tiene_pagos = total_pagado > 0
         prestamos_resultado.append(
             prestamo
         )
@@ -153,9 +159,14 @@ def eliminar_prestamo(request, prestamo_id):
         request.POST.get('origen', '')
     )
 
+    estado = request.GET.get(
+        'estado',
+        request.POST.get('estado', 'por_pagar')
+    )
+
     cliente_id = prestamo.cliente_id
 
-    # Calcular el saldo real del préstamo.
+    # Obtener las cuotas del préstamo y sus pagos.
     cuotas = (
         Cuota.objects
         .filter(prestamo=prestamo)
@@ -166,45 +177,113 @@ def eliminar_prestamo(request, prestamo_id):
     total_pagado = 0
 
     for cuota in cuotas:
+
         total_cuotas += cuota.valor
 
         for pago in cuota.pagos.all():
             total_pagado += pago.monto
 
-    pendiente = total_cuotas - total_pagado
+    # Comprobar si existe algún registro de pago.
+    tiene_pagos = Pago.objects.filter(
+        cuota__prestamo=prestamo
+    ).exists()
 
-    # Solo se eliminan préstamos completamente pagados.
-    if pendiente > 0:
+    # Hay pagos, pero todavía existe saldo pendiente.
+    tiene_abonos_pendientes = (
+        tiene_pagos and total_pagado < total_cuotas
+    )
+
+    # Bloquear préstamos con abonos o cuotas pendientes.
+    if tiene_abonos_pendientes:
+
+        messages.error(
+            request,
+            'No se puede eliminar este préstamo porque tiene pagos o abonos pendientes.'
+        )
+
         if origen == 'contabilidad_cliente':
+
             return redirect(
                 f"{reverse('contabilidad_cliente')}?cliente={cliente_id}"
             )
 
-        return redirect('lista_prestamos')
+        return redirect(
+            f"{reverse('lista_prestamos')}?estado={estado}"
+        )
 
-    # Mostrar la confirmación.
+    # Mostrar la confirmación antes de eliminar.
     if request.method == 'GET':
+
         return render(
             request,
             'prestamos/eliminar_prestamo.html',
             {
                 'prestamo': prestamo,
                 'origen': origen,
+                'estado': estado,
             }
         )
 
-    # Eliminar únicamente mediante POST.
+    # Volver a comprobar antes de eliminar mediante POST.
     if request.method == 'POST':
+
+        # Revalidar los pagos para proteger la eliminación.
+        pagos_actuales = Pago.objects.filter(
+            cuota__prestamo=prestamo
+        ).exists()
+
+        total_pagado_actual = Pago.objects.filter(
+            cuota__prestamo=prestamo
+        ).aggregate(
+            total=Sum('monto')
+        )['total'] or 0
+
+        total_cuotas_actual = Cuota.objects.filter(
+            prestamo=prestamo
+        ).aggregate(
+            total=Sum('valor')
+        )['total'] or 0
+
+        if (
+            pagos_actuales
+            and total_pagado_actual < total_cuotas_actual
+        ):
+
+            messages.error(
+                request,
+                'No se puede eliminar este préstamo porque tiene pagos o abonos pendientes.'
+            )
+
+            if origen == 'contabilidad_cliente':
+
+                return redirect(
+                    f"{reverse('contabilidad_cliente')}?cliente={cliente_id}"
+                )
+
+            return redirect(
+                f"{reverse('lista_prestamos')}?estado={estado}"
+            )
+
+        numero_prestamo = prestamo.numero_prestamo
+
         prestamo.delete()
 
+        messages.success(
+            request,
+            f'El préstamo #{numero_prestamo} fue eliminado correctamente.'
+        )
+
         if origen == 'contabilidad_cliente':
+
             return redirect(
                 f"{reverse('contabilidad_cliente')}?cliente={cliente_id}"
             )
 
         return redirect(
-            f"{reverse('lista_prestamos')}?estado=pagados"
+            f"{reverse('lista_prestamos')}?estado={estado}"
         )
+
+    return redirect('lista_prestamos')
 
 @login_required
 def detalle_prestamo(request, prestamo_id):
@@ -304,18 +383,12 @@ def detalle_prestamo(request, prestamo_id):
         }
     )
 
-
 @login_required
 def editar_prestamo(request, prestamo_id):
-
     prestamo = get_object_or_404(
         Prestamo.objects.select_related('cliente'),
         id=prestamo_id
     )
-
-    # =========================================
-    # COMPROBAR SI EXISTEN PAGOS
-    # =========================================
 
     tiene_pagos = Cuota.objects.filter(
         prestamo=prestamo,
@@ -323,66 +396,45 @@ def editar_prestamo(request, prestamo_id):
     ).exists()
 
     if tiene_pagos or not prestamo.activo:
-
         return render(
             request,
             'prestamos/editar_prestamo_bloqueado.html',
             {
                 'prestamo': prestamo,
-                'tiene_pagos': tiene_pagos,
+                'tiene_pagos': tiene_pagos
             }
         )
 
-    # =========================================
-    # EDITAR
-    # =========================================
-
     if request.method == 'POST':
-
         formulario = PrestamoEditarForm(
             request.POST,
             instance=prestamo
         )
 
         if formulario.is_valid():
-
             with transaction.atomic():
+                prestamo_editado = formulario.save(commit=False)
+                prestamo_editado.save()
 
-                prestamo = formulario.save(
-                    commit=False
-                )
-
-                prestamo.save()
-
-                # =================================
-                # COMO NO HAY PAGOS,
-                # PODEMOS REGENERAR LAS CUOTAS
-                # =================================
-
-                prestamo.cuotas.all().delete()
-
-                prestamo.crear_cuotas()
+                prestamo_editado.cuotas.all().delete()
+                prestamo_editado.crear_cuotas()
 
             return redirect(
                 'detalle_prestamo',
-                prestamo_id=prestamo.id
+                prestamo_id=prestamo_editado.id
             )
 
     else:
-
-        formulario = PrestamoEditarForm(
-            instance=prestamo
-        )
+        formulario = PrestamoEditarForm(instance=prestamo)
 
     return render(
         request,
         'prestamos/editar_prestamo.html',
         {
-            'prestamo': prestamo,
             'formulario': formulario,
+            'prestamo': prestamo
         }
     )
-
 
 @login_required
 def buscar_clientes(request):

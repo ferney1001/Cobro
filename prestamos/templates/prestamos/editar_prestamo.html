@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -21,9 +22,7 @@
 
 </head>
 
-
 <body>
-
 
     <header class="encabezado">
 
@@ -37,9 +36,7 @@
 
     </header>
 
-
     <main class="contenedor">
-
 
         <!-- VOLVER -->
 
@@ -50,9 +47,7 @@
             ← Volver al préstamo
         </a>
 
-
         <section class="tarjeta">
-
 
             <!-- INFORMACIÓN -->
 
@@ -66,7 +61,6 @@
                     {{ prestamo.cliente.nombre }}
                     {{ prestamo.cliente.apellido }}
                 </p>
-
 
                 <div class="aviso">
 
@@ -85,7 +79,6 @@
 
             </div>
 
-
             <!-- FORMULARIO -->
 
             <form
@@ -94,7 +87,6 @@
             >
 
                 {% csrf_token %}
-
 
                 <!-- TIPO DE PRÉSTAMO -->
 
@@ -118,7 +110,6 @@
 
                 </div>
 
-
                 <!-- MONTO -->
 
                 <div class="campo">
@@ -141,8 +132,7 @@
 
                 </div>
 
-
-                <!-- INTERÉS -->
+                <!-- PORCENTAJE DE INTERÉS -->
 
                 <div class="campo">
 
@@ -164,6 +154,27 @@
 
                 </div>
 
+                <!-- PLAZO EN MESES -->
+
+                <div class="campo">
+
+                    <label
+                        for="{{ formulario.plazo_meses.id_for_label }}"
+                    >
+                        Plazo del préstamo (meses)
+                    </label>
+
+                    {{ formulario.plazo_meses }}
+
+                    {% if formulario.plazo_meses.errors %}
+
+                        <div class="error">
+                            {{ formulario.plazo_meses.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
 
                 <!-- FRECUENCIA -->
 
@@ -187,7 +198,6 @@
 
                 </div>
 
-
                 <!-- NÚMERO DE CUOTAS -->
 
                 <div class="campo">
@@ -209,7 +219,6 @@
                     {% endif %}
 
                 </div>
-
 
                 <!-- FECHA DEL PRÉSTAMO -->
 
@@ -233,7 +242,6 @@
 
                 </div>
 
-
                 <!-- PRIMER COBRO -->
 
                 <div class="campo">
@@ -256,7 +264,6 @@
 
                 </div>
 
-
                 <!-- ERRORES GENERALES -->
 
                 {% if formulario.non_field_errors %}
@@ -269,7 +276,6 @@
 
                 {% endif %}
 
-
                 <!-- BOTONES -->
 
                 <div class="acciones">
@@ -280,7 +286,6 @@
                     >
                         Cancelar
                     </a>
-
 
                     <button
                         type="submit"

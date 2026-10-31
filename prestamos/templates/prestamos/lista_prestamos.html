@@ -5,7 +5,6 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -19,24 +18,15 @@
         rel="stylesheet"
         href="{% static 'prestamos/css/lista_prestamos.css' %}"
     >
-
 </head>
-
 
 <body>
 
-
     <header class="encabezado">
-
-        <h1>
-            Préstamos
-        </h1>
-
+        <h1>Préstamos</h1>
     </header>
 
-
     <main class="contenedor">
-
 
         <a
             href="{% url 'dashboard' %}"
@@ -45,13 +35,9 @@
             ← Volver al inicio
         </a>
 
-
         <div class="barra-superior">
 
-            <h2>
-                Préstamos registrados
-            </h2>
-
+            <h2>Préstamos registrados</h2>
 
             <a
                 href="{% url 'crear_prestamo' %}"
@@ -62,13 +48,9 @@
 
         </div>
 
-
         <!-- BUSCADOR -->
 
-        <form
-            method="get"
-            class="busqueda"
-        >
+        <form method="get" class="busqueda">
 
             <input
                 type="text"
@@ -79,13 +61,11 @@
                 autocomplete="off"
             >
 
-
             <input
                 type="hidden"
                 name="estado"
                 value="{{ estado }}"
             >
-
 
             <button type="submit">
                 Buscar
@@ -93,11 +73,9 @@
 
         </form>
 
-
         <!-- FILTROS -->
 
         <div class="filtros-prestamos">
-
 
             <a
                 href="?estado=por_pagar"
@@ -112,7 +90,6 @@
                 Préstamos por pagar
             </a>
 
-
             <a
                 href="?estado=pagados"
                 data-estado="pagados"
@@ -126,129 +103,83 @@
                 Préstamos pagados
             </a>
 
-
         </div>
-
 
         <!-- LISTA -->
 
         <section class="lista-prestamos">
 
-
             {% for prestamo in prestamos %}
-
 
                 <article class="tarjeta-prestamo">
 
-
                     <div class="informacion">
 
-
                         <h3>
-
                             {{ prestamo.cliente.nombre }}
                             {{ prestamo.cliente.apellido }}
-
                         </h3>
 
-
                         <p>
-
                             Préstamo #{{ prestamo.numero_prestamo }}
-
                             ·
-
                             {% if prestamo.tipo_prestamo == 'solo_intereses' %}
-
                                 Solo intereses
-
                             {% else %}
-
                                 Capital + intereses
-
                             {% endif %}
-
                         </p>
 
-
                         <p>
-
                             Monto:
-
                             <strong>
                                 ${{ prestamo.monto|dinero }}
                             </strong>
-
                         </p>
 
-
                         <p>
-
                             Interés:
                             {{ prestamo.porcentaje_interes }}%
-
                         </p>
 
-
                         <p>
-
                             Frecuencia:
                             {{ prestamo.get_frecuencia_display }}
-
                         </p>
 
-
                         <p>
-
                             Cuotas:
                             {{ prestamo.numero_cuotas }}
-
                         </p>
-
 
                         <p>
-
                             Fecha del préstamo:
-
                             {{ prestamo.fecha_prestamo|date:"d/m/Y" }}
-
                         </p>
-
 
                         {% if prestamo.estado_calculado == 'pagado' %}
 
                             <p class="estado-prestamo estado-pagado">
-
                                 ✓ PRÉSTAMO PAGADO
-
                             </p>
-
 
                         {% elif prestamo.estado_calculado == 'abono' %}
 
                             <p class="estado-prestamo estado-abono">
-
                                 ABONO
-
                             </p>
-
 
                         {% else %}
 
                             <p class="estado-prestamo estado-pendiente">
-
                                 PENDIENTE
-
                             </p>
 
                         {% endif %}
 
-
                     </div>
 
-
                     <div class="acciones-prestamo">
-
 
                         <a
                             href="{% url 'detalle_prestamo' prestamo.id %}"
@@ -257,11 +188,10 @@
                             Ver préstamo
                         </a>
 
-
-                        {% if estado == 'pagados' %}
+                        {% if prestamo.estado_calculado == 'pagado' or not prestamo.tiene_pagos %}
 
                             <a
-                                href="{% url 'eliminar_prestamo' prestamo.id %}"
+                                href="{% url 'eliminar_prestamo' prestamo.id %}?estado={{ estado }}"
                                 class="boton-eliminar"
                             >
                                 Eliminar
@@ -269,41 +199,27 @@
 
                         {% endif %}
 
-
                     </div>
-
 
                 </article>
 
-
             {% empty %}
-
 
                 <p class="sin-prestamos">
 
-
                     {% if estado == 'pagados' %}
-
                         No hay préstamos pagados.
-
                     {% else %}
-
                         No hay préstamos por pagar.
-
                     {% endif %}
-
 
                 </p>
 
-
             {% endfor %}
-
 
         </section>
 
-
     </main>
-
 
     <!-- JAVASCRIPT -->
 
@@ -311,7 +227,5 @@
         src="{% static 'prestamos/js/lista_prestamos.js' %}"
     ></script>
 
-
 </body>
-
 </html>
