@@ -1,14 +1,13 @@
 
-const buscador = document.getElementById('buscar-cliente');
-const resultados = document.getElementById('resultados-clientes');
-const clienteSeleccionado = document.getElementById('id_cliente');
-
-
 /*
     =========================================
     BUSCADOR DE CLIENTES
     =========================================
 */
+
+const buscador = document.getElementById('buscar-cliente');
+const resultados = document.getElementById('resultados-clientes');
+const clienteSeleccionado = document.getElementById('id_cliente');
 
 if (buscador && resultados && clienteSeleccionado) {
 
@@ -23,9 +22,7 @@ if (buscador && resultados && clienteSeleccionado) {
             return;
         }
 
-        fetch(
-            `/prestamos/buscar-clientes/?q=${encodeURIComponent(texto)}`
-        )
+        fetch(`/prestamos/buscar-clientes/?q=${encodeURIComponent(texto)}`)
             .then(response => response.json())
             .then(clientes => {
 
@@ -71,7 +68,7 @@ if (buscador && resultados && clienteSeleccionado) {
 
 /*
     =========================================
-    CAMPOS DEL PRÉSTAMO
+    ELEMENTOS DEL FORMULARIO
     =========================================
 */
 
@@ -85,8 +82,16 @@ const cuotasInput = document.getElementById(
     'id_numero_cuotas'
 );
 
-const plazoInput = document.getElementById(
+const plazoMesesInput = document.getElementById(
     'id_plazo_meses'
+);
+
+const plazoDiasInput = document.getElementById(
+    'id_plazo_dias'
+);
+
+const frecuenciaInput = document.getElementById(
+    'id_frecuencia'
 );
 
 const tipoPrestamoInput = document.getElementById(
@@ -96,13 +101,25 @@ const tipoPrestamoInput = document.getElementById(
 
 /*
     =========================================
-    FORMULARIO
+    CONTENEDORES DE LOS CAMPOS
     =========================================
 */
 
-const formularioPrestamo = montoInput
-    ? montoInput.closest('form')
-    : null;
+const campoPlazoMeses = document.getElementById(
+    'campo-plazo-meses'
+);
+
+const campoPlazoDias = document.getElementById(
+    'campo-plazo-dias'
+);
+
+const campoFrecuencia = document.getElementById(
+    'campo-frecuencia'
+);
+
+const campoNumeroCuotas = document.getElementById(
+    'campo-numero-cuotas'
+);
 
 
 /*
@@ -125,18 +142,9 @@ const resumenCuota = document.getElementById(
     'resumen-cuota'
 );
 
-
-/*
-    =========================================
-    REDONDEAR AL MÚLTIPLO DE $50 MÁS CERCANO
-    =========================================
-*/
-
-function redondearA50(valor) {
-
-    return Math.round(valor / 50) * 50;
-
-}
+const formularioPrestamo = montoInput
+    ? montoInput.closest('form')
+    : null;
 
 
 /*
@@ -147,14 +155,24 @@ function redondearA50(valor) {
 
 function formatoPesos(valor) {
 
-    return valor.toLocaleString(
-        'es-CO',
-        {
-            style: 'currency',
-            currency: 'COP',
-            maximumFractionDigits: 0
-        }
-    );
+    return valor.toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+    });
+
+}
+
+
+/*
+    =========================================
+    REDONDEAR AL MÚLTIPLO DE $50
+    =========================================
+*/
+
+function redondearA50(valor) {
+
+    return Math.round(valor / 50) * 50;
 
 }
 
@@ -210,7 +228,71 @@ function formatearMonto() {
 
 /*
     =========================================
-    ACTUALIZAR RESUMEN
+    CAMBIAR CAMPOS SEGÚN EL TIPO
+    =========================================
+*/
+
+function actualizarCampos() {
+
+    if (!tipoPrestamoInput) {
+        return;
+    }
+
+    const tipo = tipoPrestamoInput.value;
+
+    // Capital + intereses
+    if (tipo === 'cuotas') {
+
+        campoPlazoMeses.style.display = '';
+        campoPlazoDias.style.display = 'none';
+        campoFrecuencia.style.display = '';
+        campoNumeroCuotas.style.display = '';
+
+        frecuenciaInput.disabled = false;
+
+        plazoDiasInput.value = '';
+
+    }
+
+    // Solo intereses
+    else if (tipo === 'solo_intereses') {
+
+        campoPlazoMeses.style.display = '';
+        campoPlazoDias.style.display = 'none';
+        campoFrecuencia.style.display = 'none';
+        campoNumeroCuotas.style.display = '';
+
+        // Los préstamos de solo intereses son mensuales.
+        frecuenciaInput.value = 'mensual';
+        frecuenciaInput.disabled = false;
+
+        plazoDiasInput.value = '';
+
+    }
+
+    // Factura
+    else if (tipo === 'factura') {
+
+        campoPlazoMeses.style.display = 'none';
+        campoPlazoDias.style.display = '';
+        campoFrecuencia.style.display = '';
+        campoNumeroCuotas.style.display = '';
+
+        frecuenciaInput.disabled = false;
+
+        // Factura no utiliza plazo en meses.
+        plazoMesesInput.value = '1';
+
+    }
+
+    actualizarResumen();
+
+}
+
+
+/*
+    =========================================
+    CALCULAR Y MOSTRAR EL RESUMEN
     =========================================
 */
 
@@ -220,14 +302,14 @@ function actualizarResumen() {
         !montoInput ||
         !interesInput ||
         !cuotasInput ||
-        !plazoInput ||
-        !resumen ||
-        !resumenInteres ||
-        !resumenTotal ||
-        !resumenCuota
+        !resumen
     ) {
         return;
     }
+
+    const tipo = tipoPrestamoInput
+        ? tipoPrestamoInput.value
+        : 'cuotas';
 
     const monto = obtenerMontoNumerico();
 
@@ -235,11 +317,10 @@ function actualizarResumen() {
 
     const cuotas = parseInt(cuotasInput.value, 10);
 
-    const plazoMeses = parseInt(plazoInput.value, 10);
-
+    let interesTotal = 0;
 
     /*
-        Validar que los datos estén completos.
+        Validaciones generales
     */
 
     if (
@@ -248,9 +329,7 @@ function actualizarResumen() {
         !Number.isFinite(porcentaje) ||
         porcentaje < 0 ||
         !Number.isFinite(cuotas) ||
-        cuotas <= 0 ||
-        !Number.isFinite(plazoMeses) ||
-        plazoMeses <= 0
+        cuotas <= 0
     ) {
 
         resumen.style.display = 'none';
@@ -261,36 +340,80 @@ function actualizarResumen() {
 
     /*
         =========================================
-        CÁLCULO DEL INTERÉS
+        FACTURA
         =========================================
 
-        Interés mensual =
-        monto × porcentaje / 100
-
-        Interés total =
-        interés mensual × plazo en meses
-
-        El número de cuotas NO determina
-        cuánto interés se genera.
+        Interés = capital × porcentaje / 100 / 30 × días
     */
 
-    const interesMensual = monto * porcentaje / 100;
+    if (tipo === 'factura') {
 
-    const interesTotal = interesMensual * plazoMeses;
+        const dias = parseInt(plazoDiasInput.value, 10);
 
-    let total = 0;
+        if (
+            !Number.isFinite(dias) ||
+            dias <= 0
+        ) {
+
+            resumen.style.display = 'none';
+            return;
+
+        }
+
+        interesTotal = (
+            monto *
+            (porcentaje / 100) /
+            30 *
+            dias
+        );
+
+    }
 
 
     /*
         =========================================
         CAPITAL + INTERESES
+        Y SOLO INTERESES
         =========================================
     */
 
-    if (
-        !tipoPrestamoInput ||
-        tipoPrestamoInput.value === 'cuotas'
-    ) {
+    else {
+
+        const plazoMeses = parseInt(
+            plazoMesesInput.value,
+            10
+        );
+
+        if (
+            !Number.isFinite(plazoMeses) ||
+            plazoMeses <= 0
+        ) {
+
+            resumen.style.display = 'none';
+            return;
+
+        }
+
+        const interesMensual = monto * porcentaje / 100;
+
+        interesTotal = interesMensual * plazoMeses;
+
+    }
+
+
+    /*
+        =========================================
+        CALCULAR TOTAL
+        =========================================
+    */
+
+    let total = 0;
+
+    if (tipo === 'solo_intereses') {
+
+        total = interesTotal;
+
+    } else {
 
         total = monto + interesTotal;
 
@@ -299,27 +422,13 @@ function actualizarResumen() {
 
     /*
         =========================================
-        SOLO INTERESES
-        =========================================
-
-        El capital no se incluye en las cuotas.
-        Solamente se distribuyen los intereses.
-    */
-
-    else if (tipoPrestamoInput.value === 'solo_intereses') {
-
-        total = interesTotal;
-
-    }
-
-
-    /*
-        =========================================
-        VALOR POR CUOTA
+        CALCULAR VALOR APROXIMADO POR CUOTA
         =========================================
     */
 
-    const valorCuota = total / cuotas;
+    const totalPesos = Math.round(total);
+
+    const valorCuota = totalPesos / cuotas;
 
     const cuotaRedondeada = redondearA50(valorCuota);
 
@@ -330,11 +439,17 @@ function actualizarResumen() {
         =========================================
     */
 
-    resumenInteres.textContent = formatoPesos(interesTotal);
+    resumenInteres.textContent = formatoPesos(
+        Math.round(interesTotal)
+    );
 
-    resumenTotal.textContent = formatoPesos(total);
+    resumenTotal.textContent = formatoPesos(
+        totalPesos
+    );
 
-    resumenCuota.textContent = formatoPesos(cuotaRedondeada);
+    resumenCuota.textContent = formatoPesos(
+        cuotaRedondeada
+    );
 
     resumen.style.display = 'block';
 
@@ -343,7 +458,7 @@ function actualizarResumen() {
 
 /*
     =========================================
-    EVENTO DEL MONTO
+    EVENTOS DE LOS CAMPOS
     =========================================
 */
 
@@ -352,19 +467,11 @@ if (montoInput) {
     montoInput.addEventListener('input', function () {
 
         formatearMonto();
-
         actualizarResumen();
 
     });
 
 }
-
-
-/*
-    =========================================
-    EVENTO DEL PORCENTAJE
-    =========================================
-*/
 
 if (interesInput) {
 
@@ -375,13 +482,6 @@ if (interesInput) {
 
 }
 
-
-/*
-    =========================================
-    EVENTO DEL NÚMERO DE CUOTAS
-    =========================================
-*/
-
 if (cuotasInput) {
 
     cuotasInput.addEventListener(
@@ -391,34 +491,38 @@ if (cuotasInput) {
 
 }
 
+if (plazoMesesInput) {
 
-/*
-    =========================================
-    EVENTO DEL PLAZO EN MESES
-    =========================================
-*/
-
-if (plazoInput) {
-
-    plazoInput.addEventListener(
+    plazoMesesInput.addEventListener(
         'input',
         actualizarResumen
     );
 
 }
 
+if (plazoDiasInput) {
 
-/*
-    =========================================
-    EVENTO DEL TIPO DE PRÉSTAMO
-    =========================================
-*/
+    plazoDiasInput.addEventListener(
+        'input',
+        actualizarResumen
+    );
+
+}
+
+if (frecuenciaInput) {
+
+    frecuenciaInput.addEventListener(
+        'change',
+        actualizarResumen
+    );
+
+}
 
 if (tipoPrestamoInput) {
 
     tipoPrestamoInput.addEventListener(
         'change',
-        actualizarResumen
+        actualizarCampos
     );
 
 }
@@ -434,10 +538,9 @@ if (formularioPrestamo && montoInput) {
 
     formularioPrestamo.addEventListener('submit', function () {
 
-        // Quitar separadores del monto antes de enviarlo.
+        // Enviar el monto sin separadores.
         montoInput.value = montoInput.value.replace(/\D/g, '');
 
-        // Evitar envíos duplicados.
         const botonCrear = document.getElementById('boton-crear');
 
         if (botonCrear) {
@@ -448,6 +551,8 @@ if (formularioPrestamo && montoInput) {
     });
 
 }
+
+
 /*
     =========================================
     NOTIFICACIONES TEMPORALES
@@ -474,10 +579,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+
 /*
     =========================================
-    EJECUTAR AL CARGAR
+    INICIAR FORMULARIO
     =========================================
 */
 
-actualizarResumen();
+actualizarCampos();

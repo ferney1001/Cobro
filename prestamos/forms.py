@@ -20,6 +20,7 @@ class PrestamoForm(forms.ModelForm):
             'frecuencia',
             'numero_cuotas',
             'plazo_meses',
+            'plazo_dias',
             'fecha_prestamo',
             'fecha_primer_cobro',
         ]
@@ -61,6 +62,15 @@ class PrestamoForm(forms.ModelForm):
                 }
             ),
 
+            'plazo_dias': forms.NumberInput(
+                attrs={
+                    'type': 'number',
+                    'step': '1',
+                    'min': '1',
+                    'inputmode': 'numeric',
+                }
+            ),
+
             'fecha_prestamo': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
@@ -79,6 +89,7 @@ class PrestamoForm(forms.ModelForm):
             ('', 'Seleccione el tipo de préstamo'),
             ('cuotas', 'Capital + intereses en cuotas'),
             ('solo_intereses', 'Solo intereses'),
+            ('factura', 'Factura'),
         ]
 
         self.fields['frecuencia'].choices = [
@@ -89,11 +100,44 @@ class PrestamoForm(forms.ModelForm):
             ('mensual', 'Mensual'),
         ]
 
-        self.fields['plazo_meses'].required = True
+        self.fields['plazo_meses'].required = False
+        self.fields['plazo_dias'].required = False
 
         if not self.instance.pk:
             self.initial['fecha_prestamo'] = timezone.localdate()
             self.initial['plazo_meses'] = None
+
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        tipo_prestamo = cleaned_data.get('tipo_prestamo')
+        plazo_dias = cleaned_data.get('plazo_dias')
+        plazo_meses = cleaned_data.get('plazo_meses')
+
+        if tipo_prestamo == 'factura':
+
+            if not plazo_dias or plazo_dias <= 0:
+                self.add_error(
+                    'plazo_dias',
+                    'Ingresa una cantidad de días válida.'
+                )
+            else:
+                # Factura utiliza los días para calcular los intereses.
+                # No modifica la frecuencia ni el número de cuotas.
+                cleaned_data['plazo_meses'] = 1
+
+        else:
+
+            if not plazo_meses or plazo_meses <= 0:
+                self.add_error(
+                    'plazo_meses',
+                    'Ingresa un plazo en meses válido.'
+                )
+
+        return cleaned_data
+
 
 class PrestamoEditarForm(forms.ModelForm):
 
@@ -107,6 +151,7 @@ class PrestamoEditarForm(forms.ModelForm):
             'frecuencia',
             'numero_cuotas',
             'plazo_meses',
+            'plazo_dias',
             'fecha_prestamo',
             'fecha_primer_cobro',
         ]
@@ -149,6 +194,15 @@ class PrestamoEditarForm(forms.ModelForm):
                 }
             ),
 
+            'plazo_dias': forms.NumberInput(
+                attrs={
+                    'type': 'number',
+                    'step': '1',
+                    'min': '1',
+                    'inputmode': 'numeric',
+                }
+            ),
+
             'fecha_prestamo': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
@@ -167,6 +221,7 @@ class PrestamoEditarForm(forms.ModelForm):
             ('', 'Seleccione el tipo de préstamo'),
             ('cuotas', 'Capital + intereses en cuotas'),
             ('solo_intereses', 'Solo intereses'),
+            ('factura', 'Factura'),
         ]
 
         self.fields['frecuencia'].choices = [
@@ -176,6 +231,30 @@ class PrestamoEditarForm(forms.ModelForm):
             ('quincenal', 'Cada 15 días'),
             ('mensual', 'Mensual'),
         ]
+
+        self.fields['plazo_meses'].required = False
+        self.fields['plazo_dias'].required = False
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        tipo_prestamo = cleaned_data.get('tipo_prestamo')
+        plazo_dias = cleaned_data.get('plazo_dias')
+
+        if tipo_prestamo == 'factura':
+
+            if not plazo_dias or plazo_dias <= 0:
+                self.add_error(
+                    'plazo_dias',
+                    'Ingresa una cantidad de días válida.'
+                )
+            else:
+                cleaned_data['numero_cuotas'] = plazo_dias
+                cleaned_data['frecuencia'] = 'diaria'
+                cleaned_data['plazo_meses'] = 1
+
+        return cleaned_data
 
 
 class PagoForm(forms.ModelForm):

@@ -90,6 +90,11 @@
                 Préstamos
             </a>
 
+            <a href="{% url 'adelantar_pago' %}">
+                Adelantar pago
+            </a>
+
+
 
             <a
                 href="{% url 'contabilidad' %}"
@@ -217,8 +222,12 @@
 
                                 {% if item.cuota.prestamo.tipo_prestamo == 'solo_intereses' %}
                                     Solo intereses
-                                {% else %}
+                                {% elif item.cuota.prestamo.tipo_prestamo == 'factura' %}
+                                    Factura
+                                {% elif item.cuota.prestamo.tipo_prestamo == 'cuotas' %}
                                     Capital + intereses
+                                {% else %}
+                                    Tipo no identificado
                                 {% endif %}
 
                                 · Cuota {{ item.cuota.numero }}
@@ -380,8 +389,12 @@
 
                                 {% if item.cuota.prestamo.tipo_prestamo == 'solo_intereses' %}
                                     Solo intereses
-                                {% else %}
+                                {% elif item.cuota.prestamo.tipo_prestamo == 'factura' %}
+                                    Factura
+                                {% elif item.cuota.prestamo.tipo_prestamo == 'cuotas' %}
                                     Capital + intereses
+                                {% else %}
+                                    Tipo no identificado
                                 {% endif %}
 
                                 · Cuota {{ item.cuota.numero }}

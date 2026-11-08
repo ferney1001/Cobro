@@ -525,14 +525,25 @@
                         Tipo:
 
                         {% if prestamo_seleccionado.tipo_prestamo == 'solo_intereses' %}
+
                             Solo intereses
-                        {% else %}
+
+                        {% elif prestamo_seleccionado.tipo_prestamo == 'factura' %}
+
+                            Factura
+
+                        {% elif prestamo_seleccionado.tipo_prestamo == 'cuotas' %}
+
                             Capital + intereses
+
+                        {% else %}
+
+                            Tipo no identificado
+
                         {% endif %}
 
                     </p>
-
-                </div>
+                                    </div>
 
 
                 <!-- RESUMEN -->

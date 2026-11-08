@@ -22,6 +22,7 @@ class Prestamo(models.Model):
     TIPO_PRESTAMO_CHOICES = [
         ('cuotas', 'Capital + intereses en cuotas'),
         ('solo_intereses', 'Solo intereses'),
+        ('factura', 'Factura'),
     ]
 
     cliente = models.ForeignKey(
@@ -62,6 +63,11 @@ class Prestamo(models.Model):
         default=1
     )
 
+    plazo_dias = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+
     fecha_prestamo = models.DateField()
 
     fecha_primer_cobro = models.DateField()
@@ -76,6 +82,8 @@ class Prestamo(models.Model):
 
     def __str__(self):
         return f"Préstamo de {self.cliente} - ${self.monto}"
+
+
 
     def clean(self):
 
@@ -95,10 +103,25 @@ class Prestamo(models.Model):
                 'El número de cuotas debe ser mayor que cero.'
             )
 
-        if self.plazo_meses <= 0:
-            raise ValidationError(
-                'El plazo debe ser de al menos un mes.'
-            )
+        if self.tipo_prestamo == 'factura':
+
+            if not self.plazo_dias or self.plazo_dias <= 0:
+                raise ValidationError(
+                    'La factura debe tener al menos un día de plazo.'
+                )
+
+            if self.frecuencia not in ['diaria', 'semanal', 'quincenal']:
+                raise ValidationError(
+                    'La factura debe tener frecuencia diaria, '
+                    'semanal o cada 15 días.'
+                )
+
+        else:
+
+            if self.plazo_meses <= 0:
+                raise ValidationError(
+                    'El plazo debe ser de al menos un mes.'
+                )
 
         if (
             self.tipo_prestamo == 'solo_intereses'
@@ -133,35 +156,46 @@ class Prestamo(models.Model):
 
         super().save(*args, **kwargs)
 
-        if es_nuevo:
-            self.crear_cuotas()
-
     def crear_cuotas(self):
 
-        # Calcular los intereses del plazo
-        interes_mensual = (
-            self.monto *
-            self.porcentaje_interes /
-            Decimal('100')
-        )
+        if self.cuotas.exists():
+            return
 
-        interes_total = (
-            interes_mensual *
-            self.plazo_meses
-        )
+        if self.tipo_prestamo == 'factura':
 
-        # Definir el total según la modalidad
-        if self.tipo_prestamo == 'solo_intereses':
-            total = interes_total
-        else:
+            interes_total = (
+                self.monto *
+                self.porcentaje_interes /
+                Decimal('100') *
+                Decimal(self.plazo_dias) /
+                Decimal('30')
+            )
+
             total = self.monto + interes_total
+
+        else:
+
+            interes_mensual = (
+                self.monto *
+                self.porcentaje_interes /
+                Decimal('100')
+            )
+
+            interes_total = (
+                interes_mensual *
+                self.plazo_meses
+            )
+
+            if self.tipo_prestamo == 'solo_intereses':
+                total = interes_total
+            else:
+                total = self.monto + interes_total
 
         total = total.quantize(
             Decimal('1'),
             rounding=ROUND_HALF_UP
         )
 
-        # Calcular el valor base de cada cuota
         valor_base = total / self.numero_cuotas
 
         valor_redondeado = (
@@ -171,7 +205,6 @@ class Prestamo(models.Model):
             ) * Decimal('50')
         )
 
-        # Ajustar para conservar el total exacto
         total_redondeado = (
             valor_redondeado *
             self.numero_cuotas
@@ -188,7 +221,6 @@ class Prestamo(models.Model):
             Decimal(bloques * 50)
         )
 
-        # Crear las cuotas
         for numero in range(1, self.numero_cuotas + 1):
 
             valor = valor_redondeado
@@ -199,7 +231,6 @@ class Prestamo(models.Model):
                 else:
                     valor += Decimal('50')
 
-            # Ajustar los pesos restantes en la primera cuota
             if numero == 1 and resto > 0:
                 if diferencia < 0:
                     valor -= resto
@@ -217,28 +248,24 @@ class Prestamo(models.Model):
 
     def calcular_fecha_cobro(self, numero):
 
-        # Diaria
         if self.frecuencia == 'diaria':
             return (
                 self.fecha_primer_cobro +
                 timedelta(days=numero - 1)
             )
 
-        # Semanal
         if self.frecuencia == 'semanal':
             return (
                 self.fecha_primer_cobro +
                 timedelta(weeks=numero - 1)
             )
 
-        # Cada 15 días
         if self.frecuencia == 'quincenal':
             return (
                 self.fecha_primer_cobro +
                 timedelta(days=15 * (numero - 1))
             )
 
-        # Mensual
         if self.frecuencia == 'mensual':
             return sumar_meses(
                 self.fecha_primer_cobro,
@@ -246,7 +273,6 @@ class Prestamo(models.Model):
             )
 
         return self.fecha_primer_cobro
-
 
 def sumar_meses(fecha, meses):
 

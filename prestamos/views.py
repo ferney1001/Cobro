@@ -12,6 +12,8 @@ from clientes.models import Cliente
 from .forms import PrestamoForm, PrestamoEditarForm, PagoForm
 from .models import Prestamo, Cuota, Pago
 from django.contrib import messages
+from decimal import Decimal
+
 
 @login_required
 def crear_prestamo(request):
@@ -22,17 +24,29 @@ def crear_prestamo(request):
 
         if formulario.is_valid():
 
-            prestamo = formulario.save()
+            try:
+                with transaction.atomic():
 
-            messages.success(
-                request,
-                f'¡Préstamo #{prestamo.numero_prestamo} creado correctamente!'
-            )
+                    # Guardar el préstamo.
+                    prestamo = formulario.save()
 
-            return redirect('crear_prestamo')
+                    # Generar todas sus cuotas.
+                    prestamo.crear_cuotas()
+
+                messages.success(
+                    request,
+                    f'¡Préstamo #{prestamo.numero_prestamo} creado correctamente!'
+                )
+
+                return redirect('crear_prestamo')
+
+            except Exception as error:
+                messages.error(
+                    request,
+                    f'No se pudo crear el préstamo: {error}'
+                )
 
     else:
-
         formulario = PrestamoForm()
 
     return render(
@@ -468,11 +482,12 @@ def buscar_clientes(request):
         )
 
     clientes = Cliente.objects.filter(
-        consulta
+        consulta,
+        activo=True
     ).order_by(
         'nombre',
         'apellido'
-    )
+    )[:10]
 
     resultados = [
         {
@@ -491,6 +506,53 @@ def buscar_clientes(request):
         safe=False
     )
 
+@login_required
+def buscar_prestamos_cliente(request):
+
+    cliente_id = request.GET.get('cliente_id')
+
+    if not cliente_id:
+        return JsonResponse([], safe=False)
+
+    prestamos = Prestamo.objects.filter(
+        cliente_id=cliente_id
+    ).prefetch_related(
+        'cuotas__pagos'
+    ).order_by(
+        'numero_prestamo'
+    )
+
+    resultados = []
+
+    for prestamo in prestamos:
+
+        saldo_pendiente = Decimal('0.00')
+
+        for cuota in prestamo.cuotas.all():
+
+            abonado = sum(
+                (pago.monto for pago in cuota.pagos.all()),
+                Decimal('0.00')
+            )
+
+            pendiente = cuota.valor - abonado
+
+            if pendiente > Decimal('0.00'):
+                saldo_pendiente += pendiente
+
+        if saldo_pendiente > Decimal('0.00'):
+
+            resultados.append({
+                'id': prestamo.id,
+                'numero': prestamo.numero_prestamo,
+                'monto': str(prestamo.monto),
+                'saldo_pendiente': str(saldo_pendiente)
+            })
+
+    return JsonResponse(
+        resultados,
+        safe=False
+    )
 
 @login_required
 def registrar_pago(request, cuota_id):
@@ -575,22 +637,9 @@ def registrar_pago(request, cuota_id):
                     None,
                     'Hay cuotas seleccionadas más de una vez.'
                 )
-
-            # Sin adelantos, solo se puede pagar el pendiente actual.
-            elif (
-                not incluir_siguientes
-                and monto_recibido > pendiente
-            ):
-
-                formulario.add_error(
-                    'monto',
-                    (
-                        'El pago no puede superar el pendiente '
-                        f'de ${pendiente:.0f}.'
-                    )
-                )
-
-            else:
+                
+            # Preparar las cuotas donde se aplicará el dinero.
+            if not formulario.errors:
 
                 cuotas_destino = [cuota]
 
@@ -814,6 +863,49 @@ def registrar_pago(request, cuota_id):
             'pendiente': pendiente,
             'cuotas_siguientes': cuotas_disponibles,
         }
+    )
+
+@login_required
+def buscar_cuotas_prestamo(request):
+
+    prestamo_id = request.GET.get('prestamo_id')
+
+    if not prestamo_id:
+        return JsonResponse([], safe=False)
+
+    cuotas = Cuota.objects.filter(
+        prestamo_id=prestamo_id
+    ).prefetch_related(
+        'pagos'
+    ).order_by(
+        'numero'
+    )
+
+    resultados = []
+
+    for cuota in cuotas:
+
+        abonado = sum(
+            (pago.monto for pago in cuota.pagos.all()),
+            Decimal('0.00')
+        )
+
+        pendiente = cuota.valor - abonado
+
+        if pendiente > Decimal('0.00'):
+
+            resultados.append({
+                'id': cuota.id,
+                'numero': cuota.numero,
+                'fecha_cobro': cuota.fecha_cobro.strftime('%d/%m/%Y'),
+                'valor': str(cuota.valor),
+                'abonado': str(abonado),
+                'pendiente': str(pendiente)
+            })
+
+    return JsonResponse(
+        resultados,
+        safe=False
     )
 
 # ============================================================
@@ -1350,5 +1442,213 @@ def contabilidad_cliente(request):
 
             'total_recogido_periodo':
                 total_recogido_periodo,
+        }
+    )
+    
+
+@login_required
+def adelantar_pago(request):
+
+    texto = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
+    cliente_id = request.GET.get(
+        'cliente'
+    )
+
+    prestamo_id = request.GET.get(
+        'prestamo'
+    )
+
+    cliente_seleccionado = None
+    prestamo_seleccionado = None
+    cuota_siguiente = None
+
+    clientes = Cliente.objects.none()
+    prestamos_cliente = []
+
+    abonado = Decimal('0.00')
+    pendiente = Decimal('0.00')
+
+    # ========================================================
+    # BUSCAR CLIENTES
+    # ========================================================
+
+    if texto:
+
+        palabras = texto.split()
+
+        consulta = Q()
+
+        for palabra in palabras:
+
+            consulta &= (
+                Q(nombre__icontains=palabra)
+                |
+                Q(apellido__icontains=palabra)
+            )
+
+        clientes = (
+            Cliente.objects
+            .filter(
+                consulta,
+                activo=True
+            )
+            .order_by(
+                'nombre',
+                'apellido'
+            )
+        )
+
+    # ========================================================
+    # SELECCIONAR CLIENTE
+    # ========================================================
+
+    if cliente_id:
+
+        cliente_seleccionado = get_object_or_404(
+            Cliente,
+            id=cliente_id,
+            activo=True
+        )
+
+    # ========================================================
+    # SI SE SELECCIONA UN PRÉSTAMO, OBTENER SU CLIENTE
+    # ========================================================
+
+    if prestamo_id:
+
+        prestamo_consultado = get_object_or_404(
+            Prestamo.objects.select_related('cliente'),
+            id=prestamo_id
+        )
+
+        cliente_seleccionado = (
+            prestamo_consultado.cliente
+        )
+
+    # ========================================================
+    # OBTENER PRÉSTAMOS CON SALDO PENDIENTE
+    # ========================================================
+
+    if cliente_seleccionado:
+
+        prestamos = (
+            Prestamo.objects
+            .filter(
+                cliente=cliente_seleccionado
+            )
+            .prefetch_related(
+                'cuotas__pagos'
+            )
+            .order_by(
+                '-fecha_prestamo',
+                '-numero_prestamo'
+            )
+        )
+
+        for prestamo in prestamos:
+
+            cuotas_prestamo = sorted(
+                prestamo.cuotas.all(),
+                key=lambda cuota: cuota.numero
+            )
+
+            saldo_pendiente = Decimal('0.00')
+
+            primera_cuota_pendiente = None
+
+            # Revisar las cuotas en orden.
+            for cuota in cuotas_prestamo:
+
+                abonado_cuota = sum(
+                    (
+                        pago.monto
+                        for pago in cuota.pagos.all()
+                    ),
+                    Decimal('0.00')
+                )
+
+                pendiente_cuota = (
+                    cuota.valor - abonado_cuota
+                )
+
+                if pendiente_cuota > Decimal('0.00'):
+
+                    saldo_pendiente += pendiente_cuota
+
+                    cuota.abonado_calculado = (
+                        abonado_cuota
+                    )
+
+                    cuota.pendiente_calculado = (
+                        pendiente_cuota
+                    )
+
+                    # Guardar la primera cuota pendiente.
+                    if primera_cuota_pendiente is None:
+
+                        primera_cuota_pendiente = cuota
+
+            # Mostrar solamente préstamos con deuda.
+            if saldo_pendiente > Decimal('0.00'):
+
+                prestamo.saldo_pendiente = (
+                    saldo_pendiente
+                )
+
+                prestamos_cliente.append(
+                    prestamo
+                )
+
+                # Identificar el préstamo seleccionado.
+                if (
+                    prestamo_id
+                    and str(prestamo.id) == str(prestamo_id)
+                ):
+
+                    prestamo_seleccionado = prestamo
+
+                    cuota_siguiente = (
+                        primera_cuota_pendiente
+                    )
+
+        # ====================================================
+        # DATOS DE LA CUOTA QUE SE VA A PAGAR
+        # ====================================================
+
+        if cuota_siguiente:
+
+            abonado = cuota_siguiente.abonado_calculado
+
+            pendiente = cuota_siguiente.pendiente_calculado
+
+    return render(
+        request,
+        'prestamos/adelantar_pago.html',
+        {
+            'busqueda': texto,
+
+            'clientes': clientes,
+
+            'cliente_seleccionado':
+                cliente_seleccionado,
+
+            'prestamos_cliente':
+                prestamos_cliente,
+
+            'prestamo_seleccionado':
+                prestamo_seleccionado,
+
+            'cuota_siguiente':
+                cuota_siguiente,
+
+            'abonado':
+                abonado,
+
+            'pendiente':
+                pendiente,
         }
     )

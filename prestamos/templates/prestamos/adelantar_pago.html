@@ -1,0 +1,68 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Adelantar pago - Cobro</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'prestamos/css/adelantar_pago.css' %}"
+    >
+</head>
+
+<body>
+
+    <header class="encabezado">
+        <h1>Adelantar pago</h1>
+        <p>Busca un cliente y selecciona el préstamo que deseas pagar.</p>
+    </header>
+
+    <main class="contenedor">
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="boton-volver"
+        >
+            ← Volver al inicio
+        </a>
+
+        <section class="seccion">
+
+            <div class="barra-superior">
+                <h2>Seleccionar cliente</h2>
+            </div>
+
+            <div class="busqueda">
+                <input
+                    type="text"
+                    id="buscar-cliente"
+                    placeholder="🔎 Buscar cliente por nombre o apellido..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <section
+                id="resultados-clientes"
+                class="resultados-clientes"
+            ></section>
+
+        </section>
+
+    </main>
+
+    <script
+        src="{% static 'prestamos/js/adelantar_pago.js' %}"
+    ></script>
+
+</body>
+</html>

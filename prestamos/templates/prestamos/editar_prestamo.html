@@ -1,61 +1,34 @@
-
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar préstamo - Cobro</title>
 
-    <link
-        rel="stylesheet"
-        href="{% static 'prestamos/css/editar_prestamo.css' %}"
-    >
-
+    <link rel="stylesheet" href="{% static 'prestamos/css/editar_prestamo.css' %}">
 </head>
 
 <body>
 
     <header class="encabezado">
-
         <div class="encabezado-contenido">
-
-            <h1>
-                Editar préstamo
-            </h1>
-
+            <h1>Editar préstamo</h1>
         </div>
-
     </header>
 
     <main class="contenedor">
 
-        <!-- VOLVER -->
-
-        <a
-            href="{% url 'detalle_prestamo' prestamo.id %}"
-            class="boton-volver"
-        >
+        <a href="{% url 'detalle_prestamo' prestamo.id %}" class="boton-volver">
             ← Volver al préstamo
         </a>
 
         <section class="tarjeta">
 
-            <!-- INFORMACIÓN -->
-
             <div class="informacion">
 
-                <h2>
-                    Préstamo #{{ prestamo.numero_prestamo }}
-                </h2>
+                <h2>Préstamo #{{ prestamo.numero_prestamo }}</h2>
 
                 <p class="cliente">
                     {{ prestamo.cliente.nombre }}
@@ -63,221 +36,182 @@
                 </p>
 
                 <div class="aviso">
-
-                    <strong>
-                        Puedes modificar este préstamo
-                    </strong>
-
+                    <strong>Puedes modificar este préstamo</strong>
                     <p>
                         Este préstamo todavía no tiene pagos registrados.
                         Al guardar los cambios, las cuotas actuales se
                         reemplazarán por unas nuevas según las condiciones
                         que selecciones.
                     </p>
-
                 </div>
 
             </div>
 
-            <!-- FORMULARIO -->
-
-            <form
-                method="post"
-                class="formulario"
-            >
+            <form method="post" class="formulario">
 
                 {% csrf_token %}
 
                 <!-- TIPO DE PRÉSTAMO -->
-
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.tipo_prestamo.id_for_label }}"
-                    >
+                    <label for="{{ formulario.tipo_prestamo.id_for_label }}">
                         Tipo de préstamo
                     </label>
 
                     {{ formulario.tipo_prestamo }}
 
                     {% if formulario.tipo_prestamo.errors %}
-
                         <div class="error">
                             {{ formulario.tipo_prestamo.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
                 <!-- MONTO -->
-
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.monto.id_for_label }}"
-                    >
+                    <label for="{{ formulario.monto.id_for_label }}">
                         Monto prestado
                     </label>
 
                     {{ formulario.monto }}
 
                     {% if formulario.monto.errors %}
-
                         <div class="error">
                             {{ formulario.monto.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
-                <!-- PORCENTAJE DE INTERÉS -->
-
+                <!-- INTERÉS -->
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.porcentaje_interes.id_for_label }}"
-                    >
+                    <label for="{{ formulario.porcentaje_interes.id_for_label }}">
                         Porcentaje de interés
                     </label>
 
                     {{ formulario.porcentaje_interes }}
 
                     {% if formulario.porcentaje_interes.errors %}
-
                         <div class="error">
                             {{ formulario.porcentaje_interes.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
                 <!-- PLAZO EN MESES -->
+                <div class="campo" id="campo-plazo-meses">
 
-                <div class="campo">
-
-                    <label
-                        for="{{ formulario.plazo_meses.id_for_label }}"
-                    >
+                    <label for="{{ formulario.plazo_meses.id_for_label }}">
                         Plazo del préstamo (meses)
                     </label>
 
                     {{ formulario.plazo_meses }}
 
                     {% if formulario.plazo_meses.errors %}
-
                         <div class="error">
                             {{ formulario.plazo_meses.errors }}
                         </div>
+                    {% endif %}
 
+                </div>
+
+                <!-- PLAZO EN DÍAS -->
+                <div class="campo" id="campo-plazo-dias">
+
+                    <label for="{{ formulario.plazo_dias.id_for_label }}">
+                        Plazo del préstamo (días)
+                    </label>
+
+                    {{ formulario.plazo_dias }}
+
+                    {% if formulario.plazo_dias.errors %}
+                        <div class="error">
+                            {{ formulario.plazo_dias.errors }}
+                        </div>
                     {% endif %}
 
                 </div>
 
                 <!-- FRECUENCIA -->
+                <div class="campo" id="campo-frecuencia">
 
-                <div class="campo">
-
-                    <label
-                        for="{{ formulario.frecuencia.id_for_label }}"
-                    >
+                    <label for="{{ formulario.frecuencia.id_for_label }}">
                         Frecuencia de cobro
                     </label>
 
                     {{ formulario.frecuencia }}
 
                     {% if formulario.frecuencia.errors %}
-
                         <div class="error">
                             {{ formulario.frecuencia.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
                 <!-- NÚMERO DE CUOTAS -->
+                <div class="campo" id="campo-numero-cuotas">
 
-                <div class="campo">
-
-                    <label
-                        for="{{ formulario.numero_cuotas.id_for_label }}"
-                    >
+                    <label for="{{ formulario.numero_cuotas.id_for_label }}">
                         Número de cuotas
                     </label>
 
                     {{ formulario.numero_cuotas }}
 
                     {% if formulario.numero_cuotas.errors %}
-
                         <div class="error">
                             {{ formulario.numero_cuotas.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
                 <!-- FECHA DEL PRÉSTAMO -->
-
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.fecha_prestamo.id_for_label }}"
-                    >
+                    <label for="{{ formulario.fecha_prestamo.id_for_label }}">
                         Fecha del préstamo
                     </label>
 
                     {{ formulario.fecha_prestamo }}
 
                     {% if formulario.fecha_prestamo.errors %}
-
                         <div class="error">
                             {{ formulario.fecha_prestamo.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
                 <!-- PRIMER COBRO -->
-
                 <div class="campo">
 
-                    <label
-                        for="{{ formulario.fecha_primer_cobro.id_for_label }}"
-                    >
+                    <label for="{{ formulario.fecha_primer_cobro.id_for_label }}">
                         Fecha del primer cobro
                     </label>
 
                     {{ formulario.fecha_primer_cobro }}
 
                     {% if formulario.fecha_primer_cobro.errors %}
-
                         <div class="error">
                             {{ formulario.fecha_primer_cobro.errors }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
                 <!-- ERRORES GENERALES -->
-
                 {% if formulario.non_field_errors %}
-
                     <div class="error">
-
                         {{ formulario.non_field_errors }}
-
                     </div>
-
                 {% endif %}
 
                 <!-- BOTONES -->
-
                 <div class="acciones">
 
                     <a
@@ -287,10 +221,7 @@
                         Cancelar
                     </a>
 
-                    <button
-                        type="submit"
-                        class="boton-guardar"
-                    >
+                    <button type="submit" class="boton-guardar">
                         Guardar cambios
                     </button>
 
@@ -302,6 +233,69 @@
 
     </main>
 
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
+            const tipoPrestamo = document.getElementById('id_tipo_prestamo');
+
+            const plazoMeses = document.getElementById('id_plazo_meses');
+            const plazoDias = document.getElementById('id_plazo_dias');
+            const frecuencia = document.getElementById('id_frecuencia');
+
+            const campoMeses = document.getElementById('campo-plazo-meses');
+            const campoDias = document.getElementById('campo-plazo-dias');
+            const campoFrecuencia = document.getElementById('campo-frecuencia');
+            const campoCuotas = document.getElementById('campo-numero-cuotas');
+
+            if (!tipoPrestamo) {
+                return;
+            }
+
+            function actualizarCampos() {
+
+                const tipo = tipoPrestamo.value;
+
+                if (tipo === 'cuotas') {
+
+                    campoMeses.style.display = '';
+                    campoDias.style.display = 'none';
+                    campoFrecuencia.style.display = '';
+                    campoCuotas.style.display = '';
+
+                }
+
+                else if (tipo === 'solo_intereses') {
+
+                    campoMeses.style.display = '';
+                    campoDias.style.display = 'none';
+                    campoFrecuencia.style.display = '';
+                    campoCuotas.style.display = '';
+
+                    frecuencia.value = 'mensual';
+
+                }
+
+                else if (tipo === 'factura') {
+
+                    campoMeses.style.display = 'none';
+                    campoDias.style.display = '';
+                    campoFrecuencia.style.display = '';
+                    campoCuotas.style.display = '';
+
+                    if (frecuencia.value === 'mensual') {
+                        frecuencia.value = 'semanal';
+                    }
+
+                }
+
+            }
+
+            tipoPrestamo.addEventListener('change', actualizarCampos);
+
+            actualizarCampos();
+
+        });
+    </script>
+
+</body>
 </html>
